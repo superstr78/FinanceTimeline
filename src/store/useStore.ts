@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import type { Transaction, AppState, MonthSummary, Loan, LoanPayment, LifeEvent } from '../types';
 
 const STORAGE_KEY = 'finance-timeline-data';
@@ -122,12 +124,79 @@ function getLoanPaymentForMonth(loan: Loan, targetYear: number, targetMonth: num
   };
 }
 
-export function useStore() {
+export function useStore(userId?: string | null) {
   const [state, setState] = useState<AppState>(getInitialState);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
 
+  // localStorage에 저장
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
+
+  // Firestore에서 데이터 로드 (로그인 시)
+  useEffect(() => {
+    if (!userId) return;
+
+    const loadFromFirestore = async () => {
+      try {
+        setIsSyncing(true);
+        const docRef = doc(db, 'users', userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data() as AppState;
+          setState({
+            transactions: data.transactions || [],
+            loans: data.loans || [],
+            events: data.events || [],
+            currentYear: state.currentYear,
+            currentMonth: state.currentMonth,
+          });
+          setLastSyncTime(new Date());
+        }
+      } catch (error) {
+        console.error('Firestore 로드 실패:', error);
+      } finally {
+        setIsSyncing(false);
+      }
+    };
+
+    loadFromFirestore();
+  }, [userId]);
+
+  // Firestore에 데이터 저장
+  const saveToFirestore = useCallback(async () => {
+    if (!userId) return;
+
+    try {
+      setIsSyncing(true);
+      const docRef = doc(db, 'users', userId);
+      await setDoc(docRef, {
+        transactions: state.transactions,
+        loans: state.loans,
+        events: state.events,
+        updatedAt: new Date().toISOString(),
+      });
+      setLastSyncTime(new Date());
+    } catch (error) {
+      console.error('Firestore 저장 실패:', error);
+      throw error;
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [userId, state.transactions, state.loans, state.events]);
+
+  // 데이터 변경 시 자동 저장 (debounce)
+  useEffect(() => {
+    if (!userId) return;
+
+    const timeoutId = setTimeout(() => {
+      saveToFirestore();
+    }, 2000); // 2초 후 자동 저장
+
+    return () => clearTimeout(timeoutId);
+  }, [userId, state.transactions, state.loans, state.events, saveToFirestore]);
 
   // ==================== 거래 관련 ====================
 
@@ -346,6 +415,9 @@ export function useStore() {
 
   return {
     ...state,
+    isSyncing,
+    lastSyncTime,
+    saveToFirestore,
     addTransaction,
     updateTransaction,
     deleteTransaction,

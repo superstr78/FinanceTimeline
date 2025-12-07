@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AuthProvider } from './store/AuthContext';
 import { AppProvider, useApp } from './store/AppContext';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
@@ -75,9 +76,11 @@ function AppContent() {
 
 function App() {
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <AuthProvider>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </AuthProvider>
   );
 }
 
