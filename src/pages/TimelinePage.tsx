@@ -95,6 +95,13 @@ export function TimelinePage() {
     setYearsToShow(3);
   }, [viewMode]);
 
+  // 날짜 변경 시 스크롤 초기화 및 표시 개수 리셋
+  useEffect(() => {
+    setMonthsToShow(6);
+    setYearsToShow(3);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentYear, currentMonth]);
+
   // 월별 뷰 데이터 생성
   const getMonths = () => {
     const months: { year: number; month: number }[] = [];
