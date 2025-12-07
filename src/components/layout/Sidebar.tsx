@@ -2,7 +2,7 @@ import {
   LayoutDashboard,
   Calendar,
   Settings,
-  Banknote,
+  Compass,
   Landmark,
   Receipt,
   Flag,
@@ -50,12 +50,12 @@ export function Sidebar({ activeTab, onTabChange, isOpen, onClose }: SidebarProp
         <div className="p-4 lg:p-6 border-b border-dark-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                <Banknote className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                <Compass className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-dark-100">재정 타임라인</h1>
-                <p className="text-xs text-dark-500">Finance Timeline</p>
+                <h1 className="text-lg font-bold text-dark-100">플랜마이라이프</h1>
+                <p className="text-xs text-dark-500">Plan My Life</p>
               </div>
             </div>
             {/* 모바일 닫기 버튼 */}
@@ -78,7 +78,7 @@ export function Sidebar({ activeTab, onTabChange, isOpen, onClose }: SidebarProp
                 onClick={() => handleTabChange(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                   isActive
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                    ? 'bg-violet-500/10 text-violet-400 border border-violet-500/20'
                     : 'text-dark-400 hover:text-dark-100 hover:bg-dark-800/50'
                 }`}
               >
@@ -90,9 +90,12 @@ export function Sidebar({ activeTab, onTabChange, isOpen, onClose }: SidebarProp
         </nav>
 
         <div className="p-3 lg:p-4 border-t border-dark-800 hidden lg:block">
-          <div className="card !p-4 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20">
-            <p className="text-sm text-dark-300">
-              재정을 계획하고 미래를 준비하세요
+          <div className="card !p-4 bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-violet-500/20">
+            <p className="text-sm text-dark-300 mb-2">
+              나의 인생을 설계하세요
+            </p>
+            <p className="text-xs text-dark-500">
+              Made by 이용우
             </p>
           </div>
         </div>
