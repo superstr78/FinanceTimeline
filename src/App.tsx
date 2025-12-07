@@ -14,6 +14,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { HelpPage } from './pages/HelpPage';
 
 const OFFLINE_MODE_KEY = 'plan-my-life-offline-mode';
+const ACTIVE_TAB_KEY = 'plan-my-life-active-tab';
 
 const PAGE_TITLES: Record<string, string> = {
   timeline: '타임라인',
@@ -27,10 +28,19 @@ const PAGE_TITLES: Record<string, string> = {
 };
 
 function AppContent() {
-  const [activeTab, setActiveTab] = useState('timeline');
+  const [activeTab, setActiveTab] = useState(() => {
+    const saved = localStorage.getItem(ACTIVE_TAB_KEY);
+    return saved && PAGE_TITLES[saved] ? saved : 'timeline';
+  });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { setCurrentDate, isSyncing, lastSyncTime } = useApp();
   const { user } = useAuth();
+
+  // 탭 변경 시 localStorage에 저장
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    localStorage.setItem(ACTIVE_TAB_KEY, tab);
+  };
 
   const renderPage = () => {
     switch (activeTab) {
@@ -69,7 +79,7 @@ function AppContent() {
     <div className="min-h-screen bg-dark-950">
       <Sidebar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
