@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Calendar, CalendarDays, Flag, Home } from 'lucide-react';
+import { Calendar, CalendarDays, Flag } from 'lucide-react';
 import { useApp } from '../store/AppContext';
 import { MonthBlock } from '../components/timeline/MonthBlock';
 import { YearBlock } from '../components/timeline/YearBlock';
@@ -10,7 +10,7 @@ import type { Transaction, LifeEvent } from '../types';
 type ViewMode = 'month' | 'year';
 
 export function TimelinePage() {
-  const { currentYear, currentMonth, setCurrentDate } = useApp();
+  const { currentYear, currentMonth } = useApp();
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [showEventForm, setShowEventForm] = useState(false);
@@ -40,18 +40,6 @@ export function TimelinePage() {
   const handleCloseEventForm = () => {
     setShowEventForm(false);
     setEditingEvent(null);
-  };
-
-  // 오늘로 이동
-  const handleToday = () => {
-    const now = new Date();
-    setCurrentDate(now.getFullYear(), now.getMonth() + 1);
-  };
-
-  // 현재 날짜가 오늘인지 확인
-  const isToday = () => {
-    const now = new Date();
-    return currentYear === now.getFullYear() && currentMonth === now.getMonth() + 1;
   };
 
   // 무한 스크롤 감지
@@ -119,51 +107,39 @@ export function TimelinePage() {
 
   return (
     <div className="space-y-4">
-      {/* 툴바: 뷰 모드, 오늘 이동, 이벤트 추가 */}
-      <div className="sticky top-0 z-20 bg-dark-950 py-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setViewMode('month')}
-              className={`btn ${
-                viewMode === 'month'
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                  : 'btn-secondary'
-              }`}
-            >
-              <Calendar className="w-4 h-4" />
-              월별 보기
-            </button>
-            <button
-              onClick={() => setViewMode('year')}
-              className={`btn ${
-                viewMode === 'year'
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                  : 'btn-secondary'
-              }`}
-            >
-              <CalendarDays className="w-4 h-4" />
-              연도별 보기
-            </button>
-            {/* 오늘이 아닐 때만 '오늘' 버튼 표시 */}
-            {!isToday() && (
-              <button
-                onClick={handleToday}
-                className="btn bg-blue-500/20 text-blue-400 border border-blue-500/40 hover:bg-blue-500/30"
-              >
-                <Home className="w-4 h-4" />
-                오늘
-              </button>
-            )}
-          </div>
+      {/* 툴바: 뷰 모드, 이벤트 추가 */}
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowEventForm(true)}
-            className="btn bg-purple-500/20 text-purple-400 border border-purple-500/40 hover:bg-purple-500/30"
+            onClick={() => setViewMode('month')}
+            className={`btn ${
+              viewMode === 'month'
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                : 'btn-secondary'
+            }`}
           >
-            <Flag className="w-4 h-4" />
-            이벤트 추가
+            <Calendar className="w-4 h-4" />
+            월별 보기
+          </button>
+          <button
+            onClick={() => setViewMode('year')}
+            className={`btn ${
+              viewMode === 'year'
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                : 'btn-secondary'
+            }`}
+          >
+            <CalendarDays className="w-4 h-4" />
+            연도별 보기
           </button>
         </div>
+        <button
+          onClick={() => setShowEventForm(true)}
+          className="btn bg-purple-500/20 text-purple-400 border border-purple-500/40 hover:bg-purple-500/30"
+        >
+          <Flag className="w-4 h-4" />
+          이벤트 추가
+        </button>
       </div>
 
       {/* 타임라인 컨텐츠 */}
