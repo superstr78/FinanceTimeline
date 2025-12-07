@@ -4,7 +4,7 @@ import { useApp } from '../store/AppContext';
 import { useAuth } from '../store/AuthContext';
 
 export function SettingsPage() {
-  const { transactions, loans, events, isSyncing, lastSyncTime, saveToFirestore } = useApp();
+  const { transactions, loans, events, assets, isSyncing, lastSyncTime, saveToFirestore } = useApp();
   const { user, loading, signInWithGoogle, logout } = useAuth();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -42,6 +42,7 @@ export function SettingsPage() {
       transactions,
       loans,
       events,
+      assets,
       exportedAt: new Date().toISOString(),
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], {
@@ -66,17 +67,23 @@ export function SettingsPage() {
       reader.onload = (e) => {
         try {
           const data = JSON.parse(e.target?.result as string);
-          if (data.transactions) {
+          if (data.transactions || data.loans || data.events || data.assets) {
             const now = new Date();
             localStorage.setItem(
               'finance-timeline-data',
               JSON.stringify({
-                transactions: data.transactions,
+                transactions: data.transactions || [],
+                loans: data.loans || [],
+                events: data.events || [],
+                assets: data.assets || [],
                 currentYear: now.getFullYear(),
                 currentMonth: now.getMonth() + 1,
               })
             );
+            alert('데이터를 성공적으로 가져왔습니다.');
             window.location.reload();
+          } else {
+            alert('유효한 데이터가 없습니다.');
           }
         } catch {
           alert('유효하지 않은 파일입니다.');
@@ -100,6 +107,7 @@ export function SettingsPage() {
     recurringCount: transactions.filter((t) => t.recurrence !== 'once').length,
     loansCount: loans.length,
     eventsCount: events.length,
+    assetsCount: assets.length,
   };
 
   const formatSyncTime = (date: Date) => {
@@ -279,6 +287,10 @@ export function SettingsPage() {
           <div className="p-3 lg:p-4 bg-dark-800/50 rounded-xl">
             <p className="text-xs lg:text-sm text-dark-400">이벤트</p>
             <p className="text-lg lg:text-2xl font-bold text-purple-400">{stats.eventsCount}건</p>
+          </div>
+          <div className="p-3 lg:p-4 bg-dark-800/50 rounded-xl">
+            <p className="text-xs lg:text-sm text-dark-400">자산</p>
+            <p className="text-lg lg:text-2xl font-bold text-teal-400">{stats.assetsCount}건</p>
           </div>
         </div>
       </div>
