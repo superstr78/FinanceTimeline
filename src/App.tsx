@@ -4,6 +4,7 @@ import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { TimelinePage } from './pages/TimelinePage';
 import { TransactionsPage } from './pages/TransactionsPage';
+import { EventsPage } from './pages/EventsPage';
 import { LoansPage } from './pages/LoansPage';
 import { SummaryPage } from './pages/SummaryPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -11,6 +12,7 @@ import { SettingsPage } from './pages/SettingsPage';
 const PAGE_TITLES: Record<string, string> = {
   timeline: '타임라인',
   transactions: '수입/지출 관리',
+  events: '이벤트 관리',
   loans: '대출 관리',
   summary: '요약',
   settings: '설정',
@@ -26,6 +28,8 @@ function AppContent() {
         return <TimelinePage />;
       case 'transactions':
         return <TransactionsPage />;
+      case 'events':
+        return <EventsPage />;
       case 'loans':
         return <LoansPage />;
       case 'summary':

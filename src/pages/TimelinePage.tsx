@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Calendar, CalendarDays, Flag } from 'lucide-react';
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { Calendar, CalendarDays } from 'lucide-react';
 import { useApp } from '../store/AppContext';
 import { MonthBlock } from '../components/timeline/MonthBlock';
 import { YearBlock } from '../components/timeline/YearBlock';
@@ -11,35 +11,23 @@ type ViewMode = 'month' | 'year';
 
 export function TimelinePage() {
   const { currentYear, currentMonth } = useApp();
-  const [showForm, setShowForm] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
-  const [showEventForm, setShowEventForm] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<LifeEvent | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('month');
+
+  // 편집 모달 상태 (타임라인에서 클릭 시 편집 가능)
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [editingEvent, setEditingEvent] = useState<LifeEvent | null>(null);
 
   // 무한 스크롤을 위한 상태
   const [monthsToShow, setMonthsToShow] = useState(6);
   const [yearsToShow, setYearsToShow] = useState(3);
   const loaderRef = useRef<HTMLDivElement>(null);
 
-  const handleEdit = (transaction: Transaction) => {
+  const handleEditTransaction = (transaction: Transaction) => {
     setEditingTransaction(transaction);
-    setShowForm(true);
-  };
-
-  const handleCloseForm = () => {
-    setShowForm(false);
-    setEditingTransaction(null);
   };
 
   const handleEditEvent = (event: LifeEvent) => {
     setEditingEvent(event);
-    setShowEventForm(true);
-  };
-
-  const handleCloseEventForm = () => {
-    setShowEventForm(false);
-    setEditingEvent(null);
   };
 
   // 무한 스크롤 감지
@@ -107,38 +95,29 @@ export function TimelinePage() {
 
   return (
     <div className="space-y-4">
-      {/* 툴바: 뷰 모드, 이벤트 추가 */}
-      <div className="flex items-center justify-between gap-2 mb-4">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setViewMode('month')}
-            className={`btn ${
-              viewMode === 'month'
-                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                : 'btn-secondary'
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            월별 보기
-          </button>
-          <button
-            onClick={() => setViewMode('year')}
-            className={`btn ${
-              viewMode === 'year'
-                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                : 'btn-secondary'
-            }`}
-          >
-            <CalendarDays className="w-4 h-4" />
-            연도별 보기
-          </button>
-        </div>
+      {/* 툴바: 뷰 모드 */}
+      <div className="flex items-center gap-2 mb-4">
         <button
-          onClick={() => setShowEventForm(true)}
-          className="btn bg-purple-500/20 text-purple-400 border border-purple-500/40 hover:bg-purple-500/30"
+          onClick={() => setViewMode('month')}
+          className={`btn ${
+            viewMode === 'month'
+              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+              : 'btn-secondary'
+          }`}
         >
-          <Flag className="w-4 h-4" />
-          이벤트 추가
+          <Calendar className="w-4 h-4" />
+          월별 보기
+        </button>
+        <button
+          onClick={() => setViewMode('year')}
+          className={`btn ${
+            viewMode === 'year'
+              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+              : 'btn-secondary'
+          }`}
+        >
+          <CalendarDays className="w-4 h-4" />
+          연도별 보기
         </button>
       </div>
 
@@ -151,7 +130,7 @@ export function TimelinePage() {
               key={`${year}-${month}`}
               year={year}
               month={month}
-              onEdit={handleEdit}
+              onEdit={handleEditTransaction}
               onEditEvent={handleEditEvent}
             />
           ))
@@ -161,7 +140,7 @@ export function TimelinePage() {
             <YearBlock
               key={year}
               year={year}
-              onEdit={handleEdit}
+              onEdit={handleEditTransaction}
               onEditEvent={handleEditEvent}
             />
           ))
@@ -175,17 +154,18 @@ export function TimelinePage() {
         </div>
       </div>
 
-      {showForm && (
+      {/* 타임라인에서 클릭 시 편집 모달 */}
+      {editingTransaction && (
         <TransactionForm
           transaction={editingTransaction}
-          onClose={handleCloseForm}
+          onClose={() => setEditingTransaction(null)}
         />
       )}
 
-      {showEventForm && (
+      {editingEvent && (
         <EventForm
           event={editingEvent}
-          onClose={handleCloseEventForm}
+          onClose={() => setEditingEvent(null)}
         />
       )}
     </div>
