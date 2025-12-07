@@ -1,9 +1,48 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
-import { TrendingUp, TrendingDown, Wallet, Flag } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Flag, Target } from 'lucide-react';
 import { useApp } from '../store/AppContext';
 
 export function SummaryPage() {
-  const { currentYear, getMultiMonthSummaries, transactions, events } = useApp();
+  const { currentYear, currentMonth, getMultiMonthSummaries, transactions, events } = useApp();
+
+  // 장기 지출 전망 계산 (5년 단위로 30년까지)
+  const longTermExpenses = useMemo(() => {
+    const periods = [5, 10, 15, 20, 25, 30];
+    const results: { years: number; totalExpense: number; totalIncome: number; balance: number }[] = [];
+
+    periods.forEach((years) => {
+      // 현재 월부터 해당 년수만큼의 월 수 계산
+      const totalMonths = years * 12;
+      let totalExpense = 0;
+      let totalIncome = 0;
+
+      let year = currentYear;
+      let month = currentMonth;
+
+      for (let i = 0; i < totalMonths; i++) {
+        const summary = getMultiMonthSummaries(year, month, 1)[0];
+        if (summary) {
+          totalExpense += summary.totalExpense;
+          totalIncome += summary.totalIncome;
+        }
+
+        month++;
+        if (month > 12) {
+          month = 1;
+          year++;
+        }
+      }
+
+      results.push({
+        years,
+        totalExpense,
+        totalIncome,
+        balance: totalIncome - totalExpense,
+      });
+    });
+
+    return results;
+  }, [currentYear, currentMonth, getMultiMonthSummaries]);
 
   // 무한 스크롤을 위한 상태
   const [yearsToShow, setYearsToShow] = useState(3);
@@ -60,8 +99,82 @@ export function SummaryPage() {
     other_expense: '기타 지출',
   };
 
+  // 금액을 억/만 단위로 포맷팅
+  const formatCompactAmount = (amount: number) => {
+    if (amount >= 100000000) {
+      return `${(amount / 100000000).toFixed(1)}억`;
+    }
+    if (amount >= 10000000) {
+      return `${(amount / 10000000).toFixed(1)}천만`;
+    }
+    if (amount >= 10000) {
+      return `${Math.round(amount / 10000)}만`;
+    }
+    return formatAmount(amount);
+  };
+
   return (
     <div className="space-y-6 lg:space-y-8">
+      {/* 장기 재정 전망 */}
+      <div className="card !p-4 lg:!p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center">
+            <Target className="w-5 h-5 text-violet-400" />
+          </div>
+          <div>
+            <h2 className="text-base lg:text-lg font-bold text-dark-100">장기 재정 전망</h2>
+            <p className="text-xs lg:text-sm text-dark-400">
+              {currentYear}년 {currentMonth}월부터 예상 총액
+            </p>
+          </div>
+        </div>
+
+        {/* 지출 전망 그리드 */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 lg:gap-3">
+          {longTermExpenses.map((item) => (
+            <div
+              key={item.years}
+              className="p-3 lg:p-4 bg-dark-800/50 rounded-xl border border-dark-700"
+            >
+              <div className="text-center">
+                <p className="text-xs lg:text-sm text-violet-400 font-medium mb-1">
+                  {item.years}년 후
+                </p>
+                <p className="text-[10px] lg:text-xs text-dark-500 mb-2">
+                  ~{currentYear + item.years}년
+                </p>
+                <div className="space-y-1">
+                  <div>
+                    <p className="text-[10px] text-dark-500">총 지출</p>
+                    <p className="text-sm lg:text-base font-bold text-rose-400">
+                      {formatCompactAmount(item.totalExpense)}
+                    </p>
+                  </div>
+                  <div className="border-t border-dark-700 pt-1">
+                    <p className="text-[10px] text-dark-500">총 수입</p>
+                    <p className="text-xs lg:text-sm font-medium text-emerald-400">
+                      {formatCompactAmount(item.totalIncome)}
+                    </p>
+                  </div>
+                  <div className="border-t border-dark-700 pt-1">
+                    <p className="text-[10px] text-dark-500">순수익</p>
+                    <p className={`text-xs lg:text-sm font-medium ${item.balance >= 0 ? 'text-blue-400' : 'text-rose-400'}`}>
+                      {item.balance >= 0 ? '+' : ''}{formatCompactAmount(item.balance)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 안내 문구 */}
+        <p className="text-[10px] lg:text-xs text-dark-500 mt-3 text-center">
+          * 현재 등록된 반복 거래와 대출 상환 계획을 기반으로 계산됩니다
+        </p>
+      </div>
+
+      {/* 연도별 요약 */}
       {getYears().map((year) => (
         <YearSummaryBlock
           key={year}
