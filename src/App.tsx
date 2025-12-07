@@ -10,6 +10,7 @@ import { EventsPage } from './pages/EventsPage';
 import { LoansPage } from './pages/LoansPage';
 import { SummaryPage } from './pages/SummaryPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { HelpPage } from './pages/HelpPage';
 
 const OFFLINE_MODE_KEY = 'plan-my-life-offline-mode';
 
@@ -20,6 +21,7 @@ const PAGE_TITLES: Record<string, string> = {
   loans: '대출 관리',
   summary: '요약',
   settings: '설정',
+  help: '도움말',
 };
 
 function AppContent() {
@@ -41,6 +43,8 @@ function AppContent() {
         return <SummaryPage />;
       case 'settings':
         return <SettingsPage />;
+      case 'help':
+        return <HelpPage />;
       default:
         return <TimelinePage />;
     }

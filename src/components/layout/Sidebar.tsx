@@ -6,6 +6,7 @@ import {
   Landmark,
   Receipt,
   Flag,
+  HelpCircle,
   X,
 } from 'lucide-react';
 
@@ -23,6 +24,7 @@ const menuItems = [
   { id: 'loans', icon: Landmark, label: '대출 관리' },
   { id: 'summary', icon: LayoutDashboard, label: '요약' },
   { id: 'settings', icon: Settings, label: '설정' },
+  { id: 'help', icon: HelpCircle, label: '도움말' },
 ];
 
 export function Sidebar({ activeTab, onTabChange, isOpen, onClose }: SidebarProps) {
