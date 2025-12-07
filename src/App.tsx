@@ -18,7 +18,7 @@ const PAGE_TITLES: Record<string, string> = {
 function AppContent() {
   const [activeTab, setActiveTab] = useState('timeline');
   const [showAddForm, setShowAddForm] = useState(false);
-  const { currentYear, currentMonth, setCurrentDate } = useApp();
+  const { setCurrentDate } = useApp();
 
   const renderPage = () => {
     switch (activeTab) {
@@ -38,12 +38,6 @@ function AppContent() {
   // 거래 추가 버튼은 타임라인과 요약 페이지에서만 표시
   const showAddButton = activeTab === 'timeline' || activeTab === 'summary';
 
-  // 현재 날짜가 오늘인지 확인 (타임라인에서만 사용)
-  const isToday = () => {
-    const now = new Date();
-    return currentYear === now.getFullYear() && currentMonth === now.getMonth() + 1;
-  };
-
   // 오늘로 이동
   const handleToday = () => {
     const now = new Date();
@@ -51,8 +45,8 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 타임라인 탭에서만 '오늘' 버튼 표시
-  const showTodayButton = activeTab === 'timeline' && !isToday();
+  // 타임라인 탭에서는 항상 '오늘' 버튼 표시
+  const showTodayButton = activeTab === 'timeline';
 
   return (
     <div className="min-h-screen bg-dark-950">
