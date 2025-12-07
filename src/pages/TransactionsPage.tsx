@@ -37,23 +37,6 @@ export function TransactionsPage() {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [transactions, filterType, searchQuery]);
 
-  // 수입/지출 합계
-  const totals = useMemo(() => {
-    const income = transactions
-      .filter((t) => t.type === 'income')
-      .reduce((sum, t) => {
-        if (t.recurrence === 'monthly') return sum + t.amount * 12;
-        return sum + t.amount;
-      }, 0);
-    const expense = transactions
-      .filter((t) => t.type === 'expense')
-      .reduce((sum, t) => {
-        if (t.recurrence === 'monthly') return sum + t.amount * 12;
-        return sum + t.amount;
-      }, 0);
-    return { income, expense, balance: income - expense };
-  }, [transactions]);
-
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('ko-KR').format(amount);
   };
@@ -86,24 +69,6 @@ export function TransactionsPage() {
 
   return (
     <div className="space-y-4 lg:space-y-6">
-      {/* 요약 카드 */}
-      <div className="grid grid-cols-3 gap-2 lg:gap-4">
-        <div className="card !p-3 lg:!p-6">
-          <p className="text-dark-400 text-xs lg:text-sm mb-1">수입</p>
-          <p className="text-sm lg:text-2xl font-bold text-emerald-400 truncate">+{formatAmount(totals.income)}</p>
-        </div>
-        <div className="card !p-3 lg:!p-6">
-          <p className="text-dark-400 text-xs lg:text-sm mb-1">지출</p>
-          <p className="text-sm lg:text-2xl font-bold text-rose-400 truncate">-{formatAmount(totals.expense)}</p>
-        </div>
-        <div className="card !p-3 lg:!p-6">
-          <p className="text-dark-400 text-xs lg:text-sm mb-1">순수익</p>
-          <p className={`text-sm lg:text-2xl font-bold truncate ${totals.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {totals.balance >= 0 ? '+' : ''}{formatAmount(totals.balance)}
-          </p>
-        </div>
-      </div>
-
       {/* 툴바 */}
       <div className="space-y-3">
         {/* 검색 + 추가 버튼 */}
