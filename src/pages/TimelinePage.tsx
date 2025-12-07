@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Calendar, CalendarDays, Flag } from 'lucide-react';
+import { Calendar, CalendarDays, Flag, ChevronLeft, ChevronRight, Home } from 'lucide-react';
 import { useApp } from '../store/AppContext';
 import { MonthBlock } from '../components/timeline/MonthBlock';
 import { YearBlock } from '../components/timeline/YearBlock';
@@ -10,7 +10,7 @@ import type { Transaction, LifeEvent } from '../types';
 type ViewMode = 'month' | 'year';
 
 export function TimelinePage() {
-  const { currentYear, currentMonth } = useApp();
+  const { currentYear, currentMonth, setCurrentDate } = useApp();
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [showEventForm, setShowEventForm] = useState(false);
@@ -40,6 +40,28 @@ export function TimelinePage() {
   const handleCloseEventForm = () => {
     setShowEventForm(false);
     setEditingEvent(null);
+  };
+
+  // 날짜 네비게이션
+  const handlePrevMonth = () => {
+    if (currentMonth === 1) {
+      setCurrentDate(currentYear - 1, 12);
+    } else {
+      setCurrentDate(currentYear, currentMonth - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (currentMonth === 12) {
+      setCurrentDate(currentYear + 1, 1);
+    } else {
+      setCurrentDate(currentYear, currentMonth + 1);
+    }
+  };
+
+  const handleToday = () => {
+    const now = new Date();
+    setCurrentDate(now.getFullYear(), now.getMonth() + 1);
   };
 
   // 무한 스크롤 감지
@@ -100,39 +122,64 @@ export function TimelinePage() {
 
   return (
     <div className="space-y-4">
-      {/* 뷰 모드 토글 및 이벤트 추가 */}
-      <div className="flex items-center justify-between gap-2 sticky top-0 z-20 bg-dark-950 py-2">
-        <div className="flex items-center gap-2">
+      {/* 툴바: 뷰 모드, 날짜 네비게이션, 이벤트 추가 */}
+      <div className="sticky top-0 z-20 bg-dark-950 py-3 space-y-3">
+        {/* 상단: 뷰 모드 토글 및 이벤트 추가 */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setViewMode('month')}
+              className={`btn ${
+                viewMode === 'month'
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                  : 'btn-secondary'
+              }`}
+            >
+              <Calendar className="w-4 h-4" />
+              월별 보기
+            </button>
+            <button
+              onClick={() => setViewMode('year')}
+              className={`btn ${
+                viewMode === 'year'
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                  : 'btn-secondary'
+              }`}
+            >
+              <CalendarDays className="w-4 h-4" />
+              연도별 보기
+            </button>
+          </div>
           <button
-            onClick={() => setViewMode('month')}
-            className={`btn ${
-              viewMode === 'month'
-                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                : 'btn-secondary'
-            }`}
+            onClick={() => setShowEventForm(true)}
+            className="btn bg-purple-500/20 text-purple-400 border border-purple-500/40 hover:bg-purple-500/30"
           >
-            <Calendar className="w-4 h-4" />
-            월별 보기
-          </button>
-          <button
-            onClick={() => setViewMode('year')}
-            className={`btn ${
-              viewMode === 'year'
-                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                : 'btn-secondary'
-            }`}
-          >
-            <CalendarDays className="w-4 h-4" />
-            연도별 보기
+            <Flag className="w-4 h-4" />
+            이벤트 추가
           </button>
         </div>
-        <button
-          onClick={() => setShowEventForm(true)}
-          className="btn bg-purple-500/20 text-purple-400 border border-purple-500/40 hover:bg-purple-500/30"
-        >
-          <Flag className="w-4 h-4" />
-          이벤트 추가
-        </button>
+
+        {/* 하단: 날짜 네비게이션 */}
+        <div className="flex items-center justify-center gap-3">
+          <button onClick={handlePrevMonth} className="btn btn-ghost p-2">
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-bold text-dark-100 min-w-[120px] text-center">
+              {currentYear}년 {currentMonth}월
+            </span>
+            <button
+              onClick={handleToday}
+              className="btn btn-secondary text-sm py-1.5 px-3"
+            >
+              <Home className="w-4 h-4" />
+              오늘
+            </button>
+          </div>
+          <button onClick={handleNextMonth} className="btn btn-ghost p-2">
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* 타임라인 컨텐츠 */}

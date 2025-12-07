@@ -3,11 +3,8 @@ import {
   Calendar,
   Settings,
   Banknote,
-  ChevronLeft,
-  ChevronRight,
   Landmark,
 } from 'lucide-react';
-import { useApp } from '../../store/AppContext';
 
 interface SidebarProps {
   activeTab: string;
@@ -22,29 +19,6 @@ const menuItems = [
 ];
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
-  const { currentYear, currentMonth, setCurrentDate } = useApp();
-
-  const handlePrevMonth = () => {
-    if (currentMonth === 1) {
-      setCurrentDate(currentYear - 1, 12);
-    } else {
-      setCurrentDate(currentYear, currentMonth - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (currentMonth === 12) {
-      setCurrentDate(currentYear + 1, 1);
-    } else {
-      setCurrentDate(currentYear, currentMonth + 1);
-    }
-  };
-
-  const handleToday = () => {
-    const now = new Date();
-    setCurrentDate(now.getFullYear(), now.getMonth() + 1);
-  };
-
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-dark-900/50 backdrop-blur-xl border-r border-dark-800 flex flex-col z-50">
       <div className="p-6 border-b border-dark-800">
@@ -58,31 +32,6 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           </div>
         </div>
       </div>
-
-      {/* 월 네비게이션 - 타임라인 탭에서만 표시 */}
-      {activeTab === 'timeline' && (
-        <div className="p-4 border-b border-dark-800">
-          <div className="flex items-center justify-between mb-3">
-            <button onClick={handlePrevMonth} className="btn btn-ghost p-2">
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <div className="text-center">
-              <span className="text-lg font-bold text-dark-100">
-                {currentYear}년 {currentMonth}월
-              </span>
-            </div>
-            <button onClick={handleNextMonth} className="btn btn-ghost p-2">
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-          <button
-            onClick={handleToday}
-            className="w-full btn btn-secondary text-sm"
-          >
-            오늘로 이동
-          </button>
-        </div>
-      )}
 
       <nav className="flex-1 p-4 space-y-1">
         {menuItems.map((item) => {
