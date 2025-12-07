@@ -20,6 +20,7 @@ const PAGE_TITLES: Record<string, string> = {
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('timeline');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { setCurrentDate } = useApp();
 
   const renderPage = () => {
@@ -53,14 +54,20 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-dark-950">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      <main className="ml-64 min-h-screen">
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+      <main className="lg:ml-64 min-h-screen">
         <Header
           title={PAGE_TITLES[activeTab]}
           onTodayClick={handleToday}
           showTodayButton={showTodayButton}
+          onMenuClick={() => setSidebarOpen(true)}
         />
-        <div className="p-6">{renderPage()}</div>
+        <div className="p-4 lg:p-6">{renderPage()}</div>
       </main>
     </div>
   );

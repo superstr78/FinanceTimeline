@@ -96,33 +96,35 @@ export function TimelinePage() {
   return (
     <div className="space-y-4">
       {/* 툴바: 뷰 모드 */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-1 sm:gap-2 mb-4">
         <button
           onClick={() => setViewMode('month')}
-          className={`btn ${
+          className={`btn text-xs sm:text-sm py-1.5 px-2 sm:py-2 sm:px-3 ${
             viewMode === 'month'
               ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
               : 'btn-secondary'
           }`}
         >
-          <Calendar className="w-4 h-4" />
-          월별 보기
+          <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">월별 보기</span>
+          <span className="sm:hidden">월별</span>
         </button>
         <button
           onClick={() => setViewMode('year')}
-          className={`btn ${
+          className={`btn text-xs sm:text-sm py-1.5 px-2 sm:py-2 sm:px-3 ${
             viewMode === 'year'
               ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
               : 'btn-secondary'
           }`}
         >
-          <CalendarDays className="w-4 h-4" />
-          연도별 보기
+          <CalendarDays className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">연도별 보기</span>
+          <span className="sm:hidden">연도별</span>
         </button>
       </div>
 
       {/* 타임라인 컨텐츠 */}
-      <div className="space-y-8">
+      <div className="space-y-6 lg:space-y-8">
         {viewMode === 'month' ? (
           // 월별 뷰
           getMonths().map(({ year, month }) => (

@@ -85,81 +85,79 @@ export function TransactionsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       {/* 요약 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="card">
-          <p className="text-dark-400 text-sm mb-1">총 수입 (연간)</p>
-          <p className="text-2xl font-bold text-emerald-400">+{formatAmount(totals.income)}원</p>
+      <div className="grid grid-cols-3 gap-2 lg:gap-4">
+        <div className="card !p-3 lg:!p-6">
+          <p className="text-dark-400 text-xs lg:text-sm mb-1">수입</p>
+          <p className="text-sm lg:text-2xl font-bold text-emerald-400 truncate">+{formatAmount(totals.income)}</p>
         </div>
-        <div className="card">
-          <p className="text-dark-400 text-sm mb-1">총 지출 (연간)</p>
-          <p className="text-2xl font-bold text-rose-400">-{formatAmount(totals.expense)}원</p>
+        <div className="card !p-3 lg:!p-6">
+          <p className="text-dark-400 text-xs lg:text-sm mb-1">지출</p>
+          <p className="text-sm lg:text-2xl font-bold text-rose-400 truncate">-{formatAmount(totals.expense)}</p>
         </div>
-        <div className="card">
-          <p className="text-dark-400 text-sm mb-1">순수익 (연간)</p>
-          <p className={`text-2xl font-bold ${totals.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {totals.balance >= 0 ? '+' : ''}{formatAmount(totals.balance)}원
+        <div className="card !p-3 lg:!p-6">
+          <p className="text-dark-400 text-xs lg:text-sm mb-1">순수익</p>
+          <p className={`text-sm lg:text-2xl font-bold truncate ${totals.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+            {totals.balance >= 0 ? '+' : ''}{formatAmount(totals.balance)}
           </p>
         </div>
       </div>
 
       {/* 툴바 */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        {/* 검색 */}
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="거래 검색..."
-            className="input pl-10 w-full"
-          />
-        </div>
-
-        <div className="flex items-center gap-3">
-          {/* 필터 */}
-          <div className="flex items-center gap-1 bg-dark-800 rounded-lg p-1">
-            <button
-              onClick={() => setFilterType('all')}
-              className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
-                filterType === 'all'
-                  ? 'bg-dark-700 text-dark-100'
-                  : 'text-dark-400 hover:text-dark-200'
-              }`}
-            >
-              전체
-            </button>
-            <button
-              onClick={() => setFilterType('income')}
-              className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
-                filterType === 'income'
-                  ? 'bg-emerald-500/20 text-emerald-400'
-                  : 'text-dark-400 hover:text-dark-200'
-              }`}
-            >
-              수입
-            </button>
-            <button
-              onClick={() => setFilterType('expense')}
-              className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
-                filterType === 'expense'
-                  ? 'bg-rose-500/20 text-rose-400'
-                  : 'text-dark-400 hover:text-dark-200'
-              }`}
-            >
-              지출
-            </button>
+      <div className="space-y-3">
+        {/* 검색 + 추가 버튼 */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="검색..."
+              className="input pl-10 w-full text-sm"
+            />
           </div>
-
-          {/* 추가 버튼 */}
           <button
             onClick={handleAdd}
-            className="btn bg-emerald-500 hover:bg-emerald-600 text-white"
+            className="btn bg-emerald-500 hover:bg-emerald-600 text-white whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
-            거래 추가
+            <span className="hidden sm:inline">추가</span>
+          </button>
+        </div>
+
+        {/* 필터 */}
+        <div className="flex items-center gap-1 bg-dark-800 rounded-lg p-1 w-fit">
+          <button
+            onClick={() => setFilterType('all')}
+            className={`px-3 py-1.5 rounded-md text-xs lg:text-sm transition-colors ${
+              filterType === 'all'
+                ? 'bg-dark-700 text-dark-100'
+                : 'text-dark-400 hover:text-dark-200'
+            }`}
+          >
+            전체
+          </button>
+          <button
+            onClick={() => setFilterType('income')}
+            className={`px-3 py-1.5 rounded-md text-xs lg:text-sm transition-colors ${
+              filterType === 'income'
+                ? 'bg-emerald-500/20 text-emerald-400'
+                : 'text-dark-400 hover:text-dark-200'
+            }`}
+          >
+            수입
+          </button>
+          <button
+            onClick={() => setFilterType('expense')}
+            className={`px-3 py-1.5 rounded-md text-xs lg:text-sm transition-colors ${
+              filterType === 'expense'
+                ? 'bg-rose-500/20 text-rose-400'
+                : 'text-dark-400 hover:text-dark-200'
+            }`}
+          >
+            지출
           </button>
         </div>
       </div>
@@ -167,75 +165,63 @@ export function TransactionsPage() {
       {/* 거래 목록 */}
       <div className="card !p-0 overflow-hidden">
         {filteredTransactions.length === 0 ? (
-          <div className="text-center py-12 text-dark-500">
+          <div className="text-center py-8 lg:py-12 text-dark-500 text-sm">
             {searchQuery || filterType !== 'all'
               ? '검색 결과가 없습니다'
-              : '등록된 거래가 없습니다. 거래를 추가해보세요!'}
+              : '등록된 거래가 없습니다'}
           </div>
         ) : (
           <div className="divide-y divide-dark-800">
             {filteredTransactions.map((t) => (
               <div
                 key={t.id}
-                className="flex items-center gap-4 p-4 hover:bg-dark-800/50 transition-colors"
+                className="flex items-start lg:items-center gap-3 p-3 lg:p-4 hover:bg-dark-800/50 transition-colors"
               >
                 {/* 타입 인디케이터 */}
                 <div
-                  className={`w-1 h-12 rounded-full ${
+                  className={`w-1 h-10 lg:h-12 rounded-full flex-shrink-0 ${
                     t.type === 'income' ? 'bg-emerald-500' : 'bg-rose-500'
                   }`}
                 />
 
                 {/* 내용 */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-dark-100 truncate">{t.title}</h3>
+                  <div className="flex items-center gap-2 mb-0.5 lg:mb-1">
+                    <h3 className="font-medium text-dark-100 truncate text-sm lg:text-base">{t.title}</h3>
                     {t.recurrence !== 'once' && (
-                      <span className="px-2 py-0.5 bg-dark-700 rounded-full text-xs text-dark-300">
+                      <span className="px-1.5 lg:px-2 py-0.5 bg-dark-700 rounded-full text-[10px] lg:text-xs text-dark-300 flex-shrink-0">
                         {RECURRENCE_LABELS[t.recurrence]}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-dark-500">
+                  <div className="flex items-center gap-1 lg:gap-2 text-xs lg:text-sm text-dark-500 flex-wrap">
                     <span>{CATEGORY_LABELS[t.category]}</span>
-                    <span>·</span>
-                    <span>{formatDate(t.date)}</span>
-                    {t.recurrenceEndDate && (
-                      <>
-                        <span>~</span>
-                        <span>{formatDate(t.recurrenceEndDate)}</span>
-                      </>
-                    )}
-                    {t.memo && (
-                      <>
-                        <span>·</span>
-                        <span className="truncate max-w-[200px]">{t.memo}</span>
-                      </>
-                    )}
+                    <span className="hidden sm:inline">·</span>
+                    <span className="hidden sm:inline">{formatDate(t.date)}</span>
                   </div>
                 </div>
 
                 {/* 금액 */}
                 <div
-                  className={`text-right font-semibold ${
+                  className={`text-right font-semibold text-sm lg:text-base flex-shrink-0 ${
                     t.type === 'income' ? 'text-emerald-400' : 'text-rose-400'
                   }`}
                 >
-                  {t.type === 'income' ? '+' : '-'}{formatAmount(t.amount)}원
+                  {t.type === 'income' ? '+' : '-'}{formatAmount(t.amount)}
                 </div>
 
                 {/* 액션 버튼 */}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5 flex-shrink-0">
                   <button
                     onClick={() => handleEdit(t)}
-                    className="p-2 text-dark-500 hover:text-dark-200 transition-colors"
+                    className="p-1.5 lg:p-2 text-dark-500 hover:text-dark-200 transition-colors"
                     title="수정"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(t.id, t.title)}
-                    className="p-2 text-dark-500 hover:text-rose-400 transition-colors"
+                    className="p-1.5 lg:p-2 text-dark-500 hover:text-rose-400 transition-colors"
                     title="삭제"
                   >
                     <Trash2 className="w-4 h-4" />

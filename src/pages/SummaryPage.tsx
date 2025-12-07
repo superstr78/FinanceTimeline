@@ -61,7 +61,7 @@ export function SummaryPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 lg:space-y-8">
       {getYears().map((year) => (
         <YearSummaryBlock
           key={year}
@@ -148,14 +148,14 @@ function YearSummaryBlock({
   const hasData = yearTotal.income > 0 || yearTotal.expense > 0 || yearEventCount > 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       {/* 연도 헤더 */}
-      <div className="flex items-center gap-3 pb-2 border-b border-dark-800">
-        <h2 className="text-2xl font-bold text-dark-100">{year}년 요약</h2>
+      <div className="flex items-center gap-2 lg:gap-3 pb-2 border-b border-dark-800">
+        <h2 className="text-xl lg:text-2xl font-bold text-dark-100">{year}년 요약</h2>
         {yearEventCount > 0 && (
-          <span className="flex items-center gap-1 px-2 py-1 bg-purple-500/20 rounded-full text-xs text-purple-400">
+          <span className="flex items-center gap-1 px-2 py-1 bg-purple-500/20 rounded-full text-[10px] lg:text-xs text-purple-400">
             <Flag className="w-3 h-3" />
-            {yearEventCount}개 이벤트
+            {yearEventCount}
           </span>
         )}
       </div>
@@ -163,50 +163,53 @@ function YearSummaryBlock({
       {hasData ? (
         <>
           {/* 연간 요약 카드 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="card">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-emerald-400" />
+          <div className="grid grid-cols-3 gap-2 lg:gap-4">
+            <div className="card !p-3 lg:!p-6">
+              <div className="flex items-center gap-2 lg:gap-3 mb-2 lg:mb-3">
+                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-400" />
                 </div>
-                <span className="text-dark-400">연간 총 수입</span>
+                <span className="text-dark-400 text-xs lg:text-base hidden sm:inline">연간 총 수입</span>
+                <span className="text-dark-400 text-xs sm:hidden">수입</span>
               </div>
-              <p className="text-2xl font-bold text-emerald-400">
-                +{formatAmount(yearTotal.income)}원
+              <p className="text-sm lg:text-2xl font-bold text-emerald-400 truncate">
+                +{formatAmount(yearTotal.income)}
               </p>
             </div>
 
-            <div className="card">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center">
-                  <TrendingDown className="w-5 h-5 text-rose-400" />
+            <div className="card !p-3 lg:!p-6">
+              <div className="flex items-center gap-2 lg:gap-3 mb-2 lg:mb-3">
+                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl bg-rose-500/20 flex items-center justify-center flex-shrink-0">
+                  <TrendingDown className="w-4 h-4 lg:w-5 lg:h-5 text-rose-400" />
                 </div>
-                <span className="text-dark-400">연간 총 지출</span>
+                <span className="text-dark-400 text-xs lg:text-base hidden sm:inline">연간 총 지출</span>
+                <span className="text-dark-400 text-xs sm:hidden">지출</span>
               </div>
-              <p className="text-2xl font-bold text-rose-400">
-                -{formatAmount(yearTotal.expense)}원
+              <p className="text-sm lg:text-2xl font-bold text-rose-400 truncate">
+                -{formatAmount(yearTotal.expense)}
               </p>
             </div>
 
-            <div className="card">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                  <Wallet className="w-5 h-5 text-blue-400" />
+            <div className="card !p-3 lg:!p-6">
+              <div className="flex items-center gap-2 lg:gap-3 mb-2 lg:mb-3">
+                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                  <Wallet className="w-4 h-4 lg:w-5 lg:h-5 text-blue-400" />
                 </div>
-                <span className="text-dark-400">연간 순수익</span>
+                <span className="text-dark-400 text-xs lg:text-base hidden sm:inline">연간 순수익</span>
+                <span className="text-dark-400 text-xs sm:hidden">순수익</span>
               </div>
-              <p className={`text-2xl font-bold ${yearTotal.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                {yearTotal.balance >= 0 ? '+' : ''}{formatAmount(yearTotal.balance)}원
+              <p className={`text-sm lg:text-2xl font-bold truncate ${yearTotal.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {yearTotal.balance >= 0 ? '+' : ''}{formatAmount(yearTotal.balance)}
               </p>
             </div>
           </div>
 
           {/* 월별 현황 */}
-          <div className="card">
-            <h3 className="text-lg font-semibold text-dark-100 mb-4">
+          <div className="card !p-3 lg:!p-6">
+            <h3 className="text-base lg:text-lg font-semibold text-dark-100 mb-3 lg:mb-4">
               월별 현황
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2 lg:space-y-3">
               {yearSummaries.map((summary) => {
                 const maxAmount = Math.max(
                   ...yearSummaries.map((s) => Math.max(s.totalIncome, s.totalExpense))
@@ -215,31 +218,31 @@ function YearSummaryBlock({
                 const expenseWidth = maxAmount > 0 ? (summary.totalExpense / maxAmount) * 100 : 0;
 
                 return (
-                  <div key={summary.month} className="flex items-center gap-4">
-                    <div className="w-12 text-sm font-medium text-dark-300">
+                  <div key={summary.month} className="flex items-center gap-2 lg:gap-4">
+                    <div className="w-8 lg:w-12 text-xs lg:text-sm font-medium text-dark-300">
                       {summary.month}월
                     </div>
                     <div className="flex-1 space-y-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 lg:gap-2">
                         <div
-                          className="h-4 bg-emerald-500/60 rounded"
+                          className="h-3 lg:h-4 bg-emerald-500/60 rounded"
                           style={{ width: `${incomeWidth}%`, minWidth: summary.totalIncome > 0 ? '4px' : '0' }}
                         />
-                        <span className="text-xs text-emerald-400 min-w-[80px]">
+                        <span className="text-[10px] lg:text-xs text-emerald-400 min-w-[50px] lg:min-w-[80px]">
                           +{formatAmount(summary.totalIncome)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 lg:gap-2">
                         <div
-                          className="h-4 bg-rose-500/60 rounded"
+                          className="h-3 lg:h-4 bg-rose-500/60 rounded"
                           style={{ width: `${expenseWidth}%`, minWidth: summary.totalExpense > 0 ? '4px' : '0' }}
                         />
-                        <span className="text-xs text-rose-400 min-w-[80px]">
+                        <span className="text-[10px] lg:text-xs text-rose-400 min-w-[50px] lg:min-w-[80px]">
                           -{formatAmount(summary.totalExpense)}
                         </span>
                       </div>
                     </div>
-                    <div className={`w-24 text-right text-sm font-medium ${
+                    <div className={`w-16 lg:w-24 text-right text-[10px] lg:text-sm font-medium ${
                       summary.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'
                     }`}>
                       {summary.balance >= 0 ? '+' : ''}{formatAmount(summary.balance)}
@@ -252,30 +255,30 @@ function YearSummaryBlock({
 
           {/* 지출 카테고리 TOP 5 */}
           {expenseByCategory.length > 0 && (
-            <div className="card">
-              <h3 className="text-lg font-semibold text-dark-100 mb-4">
+            <div className="card !p-3 lg:!p-6">
+              <h3 className="text-base lg:text-lg font-semibold text-dark-100 mb-3 lg:mb-4">
                 주요 지출 카테고리
               </h3>
-              <div className="space-y-3">
+              <div className="space-y-2 lg:space-y-3">
                 {expenseByCategory.map(([category, amount], index) => {
                   const maxAmount = expenseByCategory[0][1];
                   const width = (amount / maxAmount) * 100;
 
                   return (
-                    <div key={category} className="flex items-center gap-4">
-                      <div className="w-6 text-sm font-medium text-dark-500">
+                    <div key={category} className="flex items-center gap-2 lg:gap-4">
+                      <div className="w-5 lg:w-6 text-xs lg:text-sm font-medium text-dark-500">
                         {index + 1}
                       </div>
-                      <div className="w-24 text-sm text-dark-200">
+                      <div className="w-16 lg:w-24 text-xs lg:text-sm text-dark-200 truncate">
                         {categoryLabels[category] || category}
                       </div>
                       <div className="flex-1">
                         <div
-                          className="h-6 bg-rose-500/40 rounded flex items-center px-2"
-                          style={{ width: `${width}%`, minWidth: '60px' }}
+                          className="h-5 lg:h-6 bg-rose-500/40 rounded flex items-center px-2"
+                          style={{ width: `${width}%`, minWidth: '50px' }}
                         >
-                          <span className="text-xs text-rose-200 whitespace-nowrap">
-                            {formatAmount(amount)}원
+                          <span className="text-[10px] lg:text-xs text-rose-200 whitespace-nowrap">
+                            {formatAmount(amount)}
                           </span>
                         </div>
                       </div>
@@ -287,8 +290,8 @@ function YearSummaryBlock({
           )}
         </>
       ) : (
-        <div className="card text-center py-12">
-          <p className="text-dark-500">이 연도에 등록된 데이터가 없습니다</p>
+        <div className="card text-center py-8 lg:py-12">
+          <p className="text-dark-500 text-sm lg:text-base">이 연도에 등록된 데이터가 없습니다</p>
         </div>
       )}
     </div>

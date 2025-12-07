@@ -99,10 +99,10 @@ export function LoanForm({ loan, onClose }: LoanFormProps) {
   const monthlyPayment = calculateMonthlyPayment();
 
   return (
-    <div className="fixed inset-0 bg-dark-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="card w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-dark-100">
+    <div className="fixed inset-0 bg-dark-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="card w-full sm:max-w-lg max-h-[85vh] sm:max-h-[90vh] overflow-y-auto rounded-b-none sm:rounded-b-2xl">
+        <div className="flex items-center justify-between mb-4 lg:mb-6">
+          <h3 className="text-lg lg:text-xl font-bold text-dark-100">
             {loan ? '대출 수정' : '새 대출 추가'}
           </h3>
           <button onClick={onClose} className="btn btn-ghost p-2">
@@ -110,10 +110,10 @@ export function LoanForm({ loan, onClose }: LoanFormProps) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 lg:space-y-4">
           {/* 대출명 */}
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">
+            <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">
               대출명 *
             </label>
             <input
@@ -121,66 +121,66 @@ export function LoanForm({ loan, onClose }: LoanFormProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="예: 주택담보대출, 신용대출"
-              className="input"
+              className="input text-sm lg:text-base"
               autoFocus
             />
           </div>
 
-          {/* 대출 원금 */}
-          <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">
-              대출 원금 *
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                value={principal}
-                onChange={(e) => setPrincipal(e.target.value)}
-                placeholder="0"
-                className="input pr-12"
-                min="0"
-              />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-dark-400">원</span>
+          {/* 대출 원금 & 연이율 */}
+          <div className="grid grid-cols-2 gap-2 lg:gap-3">
+            <div>
+              <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">
+                대출 원금 *
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  value={principal}
+                  onChange={(e) => setPrincipal(e.target.value)}
+                  placeholder="0"
+                  className="input pr-10 text-sm lg:text-base"
+                  min="0"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-400 text-xs lg:text-sm">원</span>
+              </div>
             </div>
-          </div>
-
-          {/* 연이율 */}
-          <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">
-              연이율 *
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                value={interestRate}
-                onChange={(e) => setInterestRate(e.target.value)}
-                placeholder="0.0"
-                className="input pr-12"
-                min="0"
-                step="0.01"
-              />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-dark-400">%</span>
+            <div>
+              <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">
+                연이율 *
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  value={interestRate}
+                  onChange={(e) => setInterestRate(e.target.value)}
+                  placeholder="0.0"
+                  className="input pr-10 text-sm lg:text-base"
+                  min="0"
+                  step="0.01"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-400 text-xs lg:text-sm">%</span>
+              </div>
             </div>
           </div>
 
           {/* 상환 방식 */}
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <label className="text-sm font-medium text-dark-300">상환 방식</label>
+            <div className="flex items-center gap-2 mb-1.5 lg:mb-2">
+              <label className="text-xs lg:text-sm font-medium text-dark-300">상환 방식</label>
               <button
                 type="button"
                 onClick={() => setShowHelp(!showHelp)}
                 className="text-dark-500 hover:text-dark-300"
               >
-                <HelpCircle className="w-4 h-4" />
+                <HelpCircle className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
               </button>
             </div>
             {showHelp && (
-              <div className="mb-3 p-3 bg-dark-800/50 rounded-lg text-sm space-y-2">
+              <div className="mb-2 lg:mb-3 p-2 lg:p-3 bg-dark-800/50 rounded-lg text-xs lg:text-sm space-y-1.5 lg:space-y-2">
                 {repaymentTypes.map((type) => (
                   <div key={type}>
                     <span className="text-dark-200 font-medium">{REPAYMENT_TYPE_LABELS[type]}</span>
-                    <p className="text-dark-400 text-xs">{REPAYMENT_TYPE_DESC[type]}</p>
+                    <p className="text-dark-400 text-[10px] lg:text-xs">{REPAYMENT_TYPE_DESC[type]}</p>
                   </div>
                 ))}
               </div>
@@ -188,7 +188,7 @@ export function LoanForm({ loan, onClose }: LoanFormProps) {
             <select
               value={repaymentType}
               onChange={(e) => setRepaymentType(e.target.value as RepaymentType)}
-              className="input"
+              className="input text-sm lg:text-base"
             >
               {repaymentTypes.map((type) => (
                 <option key={type} value={type}>
@@ -200,20 +200,20 @@ export function LoanForm({ loan, onClose }: LoanFormProps) {
 
           {/* 상환 기간 */}
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">
+            <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">
               상환 기간 *
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 lg:gap-3">
               <div className="relative">
                 <input
                   type="number"
                   value={termYears}
                   onChange={(e) => setTermYears(e.target.value)}
                   placeholder="0"
-                  className="input pr-12"
+                  className="input pr-10 text-sm lg:text-base"
                   min="0"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-dark-400">년</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-400 text-xs lg:text-sm">년</span>
               </div>
               <div className="relative">
                 <input
@@ -221,79 +221,79 @@ export function LoanForm({ loan, onClose }: LoanFormProps) {
                   value={termMonths}
                   onChange={(e) => setTermMonths(e.target.value)}
                   placeholder="0"
-                  className="input pr-12"
+                  className="input pr-10 text-sm lg:text-base"
                   min="0"
                   max="11"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-dark-400">개월</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-400 text-xs lg:text-sm">개월</span>
               </div>
             </div>
           </div>
 
-          {/* 대출 시작일 */}
-          <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">
-              대출 시작일 *
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="input"
-            />
-          </div>
-
-          {/* 상환일 */}
-          <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">
-              매월 상환일
-            </label>
-            <select
-              value={paymentDay}
-              onChange={(e) => setPaymentDay(e.target.value)}
-              className="input"
-            >
-              {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
-                <option key={day} value={day}>
-                  {day}일
-                </option>
-              ))}
-            </select>
+          {/* 대출 시작일 & 상환일 */}
+          <div className="grid grid-cols-2 gap-2 lg:gap-3">
+            <div>
+              <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">
+                대출 시작일 *
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="input text-sm lg:text-base"
+              />
+            </div>
+            <div>
+              <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">
+                매월 상환일
+              </label>
+              <select
+                value={paymentDay}
+                onChange={(e) => setPaymentDay(e.target.value)}
+                className="input text-sm lg:text-base"
+              >
+                {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
+                  <option key={day} value={day}>
+                    {day}일
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* 메모 */}
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">메모</label>
+            <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">메모</label>
             <textarea
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
               placeholder="추가 메모 (선택)"
-              className="input min-h-[60px] resize-none"
+              className="input min-h-[50px] lg:min-h-[60px] resize-none text-sm lg:text-base"
             />
           </div>
 
           {/* 예상 월 상환액 */}
           {monthlyPayment && (
-            <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
-              <p className="text-sm text-dark-400 mb-1">예상 월 상환액</p>
-              <p className="text-xl font-bold text-blue-400">
+            <div className="p-3 lg:p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+              <p className="text-xs lg:text-sm text-dark-400 mb-1">예상 월 상환액</p>
+              <p className="text-lg lg:text-xl font-bold text-blue-400">
                 {new Intl.NumberFormat('ko-KR').format(monthlyPayment)}원
               </p>
               {repaymentType === 'equal_principal' && (
-                <p className="text-xs text-dark-500 mt-1">* 첫 달 기준 (이후 점점 감소)</p>
+                <p className="text-[10px] lg:text-xs text-dark-500 mt-1">* 첫 달 기준 (이후 점점 감소)</p>
               )}
               {repaymentType === 'bullet' && (
-                <p className="text-xs text-dark-500 mt-1">* 이자만 (만기에 원금 일시 상환)</p>
+                <p className="text-[10px] lg:text-xs text-dark-500 mt-1">* 이자만 (만기에 원금 일시 상환)</p>
               )}
             </div>
           )}
 
           {/* 버튼 */}
-          <div className="flex gap-3 pt-4">
-            <button type="button" onClick={onClose} className="btn btn-secondary flex-1">
+          <div className="flex gap-2 lg:gap-3 pt-3 lg:pt-4">
+            <button type="button" onClick={onClose} className="btn btn-secondary flex-1 text-sm lg:text-base">
               취소
             </button>
-            <button type="submit" className="btn bg-blue-500 hover:bg-blue-600 text-white flex-1">
+            <button type="submit" className="btn bg-blue-500 hover:bg-blue-600 text-white flex-1 text-sm lg:text-base">
               {loan ? '수정하기' : '추가하기'}
             </button>
           </div>
