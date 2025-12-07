@@ -45,6 +45,7 @@ export interface MonthSummary {
 export interface AppState {
   transactions: Transaction[];
   loans: Loan[];
+  events: LifeEvent[];
   currentYear: number;
   currentMonth: number;
 }
@@ -147,4 +148,95 @@ export const REPAYMENT_TYPE_DESC: Record<RepaymentType, string> = {
   equal_principal_interest: '매월 동일한 금액(원금+이자)을 상환',
   equal_principal: '매월 동일한 원금 + 점점 줄어드는 이자 상환',
   bullet: '매월 이자만 납부, 만기에 원금 일시 상환',
+};
+
+// ==================== 이벤트 관련 타입 ====================
+
+// 이벤트 카테고리
+export type EventCategory =
+  | 'housing'      // 주거 (입주, 이사, 전세만기)
+  | 'contract'     // 계약 (계약갱신, 만기)
+  | 'career'       // 커리어 (입사, 퇴사, 이직)
+  | 'family'       // 가족 (결혼, 출산)
+  | 'education'    // 교육 (입학, 졸업)
+  | 'other';       // 기타
+
+// 주요 이벤트 인터페이스
+export interface LifeEvent {
+  id: string;
+  title: string;
+  category: EventCategory;
+  date: string;           // YYYY-MM-DD
+  description?: string;
+  isImportant: boolean;   // 중요 표시
+  color: EventColor;
+  createdAt: string;
+}
+
+// 이벤트 색상
+export type EventColor = 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink';
+
+// 이벤트 카테고리 라벨
+export const EVENT_CATEGORY_LABELS: Record<EventCategory, string> = {
+  housing: '주거',
+  contract: '계약',
+  career: '커리어',
+  family: '가족',
+  education: '교육',
+  other: '기타',
+};
+
+// 이벤트 색상 클래스
+export const EVENT_COLOR_CLASSES: Record<EventColor, string> = {
+  red: 'bg-red-500',
+  orange: 'bg-orange-500',
+  yellow: 'bg-yellow-500',
+  green: 'bg-green-500',
+  blue: 'bg-blue-500',
+  purple: 'bg-purple-500',
+  pink: 'bg-pink-500',
+};
+
+// 이벤트 텍스트 색상 클래스
+export const EVENT_TEXT_CLASSES: Record<EventColor, string> = {
+  red: 'text-red-400',
+  orange: 'text-orange-400',
+  yellow: 'text-yellow-400',
+  green: 'text-green-400',
+  blue: 'text-blue-400',
+  purple: 'text-purple-400',
+  pink: 'text-pink-400',
+};
+
+// 이벤트 배경 색상 클래스 (투명도 포함)
+export const EVENT_BG_CLASSES: Record<EventColor, string> = {
+  red: 'bg-red-500/10 border-red-500/30 hover:bg-red-500/20',
+  orange: 'bg-orange-500/10 border-orange-500/30 hover:bg-orange-500/20',
+  yellow: 'bg-yellow-500/10 border-yellow-500/30 hover:bg-yellow-500/20',
+  green: 'bg-green-500/10 border-green-500/30 hover:bg-green-500/20',
+  blue: 'bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20',
+  purple: 'bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20',
+  pink: 'bg-pink-500/10 border-pink-500/30 hover:bg-pink-500/20',
+};
+
+// 이벤트 아이콘 배경 클래스
+export const EVENT_ICON_BG_CLASSES: Record<EventColor, string> = {
+  red: 'bg-red-500/20',
+  orange: 'bg-orange-500/20',
+  yellow: 'bg-yellow-500/20',
+  green: 'bg-green-500/20',
+  blue: 'bg-blue-500/20',
+  purple: 'bg-purple-500/20',
+  pink: 'bg-pink-500/20',
+};
+
+// 이벤트 뱃지 클래스
+export const EVENT_BADGE_CLASSES: Record<EventColor, string> = {
+  red: 'bg-red-500/20 text-red-400',
+  orange: 'bg-orange-500/20 text-orange-400',
+  yellow: 'bg-yellow-500/20 text-yellow-400',
+  green: 'bg-green-500/20 text-green-400',
+  blue: 'bg-blue-500/20 text-blue-400',
+  purple: 'bg-purple-500/20 text-purple-400',
+  pink: 'bg-pink-500/20 text-pink-400',
 };

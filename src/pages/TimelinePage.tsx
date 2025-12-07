@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Calendar, CalendarDays } from 'lucide-react';
+import { Calendar, CalendarDays, Flag } from 'lucide-react';
 import { useApp } from '../store/AppContext';
 import { MonthBlock } from '../components/timeline/MonthBlock';
 import { YearBlock } from '../components/timeline/YearBlock';
 import { TransactionForm } from '../components/timeline/TransactionForm';
-import type { Transaction } from '../types';
+import { EventForm } from '../components/events/EventForm';
+import type { Transaction, LifeEvent } from '../types';
 
 type ViewMode = 'month' | 'year';
 
@@ -12,6 +13,8 @@ export function TimelinePage() {
   const { currentYear, currentMonth } = useApp();
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<LifeEvent | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('month');
 
   // 무한 스크롤을 위한 상태
@@ -27,6 +30,16 @@ export function TimelinePage() {
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingTransaction(null);
+  };
+
+  const handleEditEvent = (event: LifeEvent) => {
+    setEditingEvent(event);
+    setShowEventForm(true);
+  };
+
+  const handleCloseEventForm = () => {
+    setShowEventForm(false);
+    setEditingEvent(null);
   };
 
   // 무한 스크롤 감지
@@ -87,29 +100,38 @@ export function TimelinePage() {
 
   return (
     <div className="space-y-4">
-      {/* 뷰 모드 토글 */}
-      <div className="flex items-center gap-2 sticky top-0 z-20 bg-dark-950 py-2">
+      {/* 뷰 모드 토글 및 이벤트 추가 */}
+      <div className="flex items-center justify-between gap-2 sticky top-0 z-20 bg-dark-950 py-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setViewMode('month')}
+            className={`btn ${
+              viewMode === 'month'
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                : 'btn-secondary'
+            }`}
+          >
+            <Calendar className="w-4 h-4" />
+            월별 보기
+          </button>
+          <button
+            onClick={() => setViewMode('year')}
+            className={`btn ${
+              viewMode === 'year'
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                : 'btn-secondary'
+            }`}
+          >
+            <CalendarDays className="w-4 h-4" />
+            연도별 보기
+          </button>
+        </div>
         <button
-          onClick={() => setViewMode('month')}
-          className={`btn ${
-            viewMode === 'month'
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-              : 'btn-secondary'
-          }`}
+          onClick={() => setShowEventForm(true)}
+          className="btn bg-purple-500/20 text-purple-400 border border-purple-500/40 hover:bg-purple-500/30"
         >
-          <Calendar className="w-4 h-4" />
-          월별 보기
-        </button>
-        <button
-          onClick={() => setViewMode('year')}
-          className={`btn ${
-            viewMode === 'year'
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-              : 'btn-secondary'
-          }`}
-        >
-          <CalendarDays className="w-4 h-4" />
-          연도별 보기
+          <Flag className="w-4 h-4" />
+          이벤트 추가
         </button>
       </div>
 
@@ -123,6 +145,7 @@ export function TimelinePage() {
               year={year}
               month={month}
               onEdit={handleEdit}
+              onEditEvent={handleEditEvent}
             />
           ))
         ) : (
@@ -148,6 +171,13 @@ export function TimelinePage() {
         <TransactionForm
           transaction={editingTransaction}
           onClose={handleCloseForm}
+        />
+      )}
+
+      {showEventForm && (
+        <EventForm
+          event={editingEvent}
+          onClose={handleCloseEventForm}
         />
       )}
     </div>

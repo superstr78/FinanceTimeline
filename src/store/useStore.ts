@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Transaction, AppState, MonthSummary, Loan, LoanPayment } from '../types';
+import type { Transaction, AppState, MonthSummary, Loan, LoanPayment, LifeEvent } from '../types';
 
 const STORAGE_KEY = 'finance-timeline-data';
 
@@ -12,6 +12,7 @@ const getInitialState = (): AppState => {
       return {
         transactions: parsed.transactions || [],
         loans: parsed.loans || [],
+        events: parsed.events || [],
         currentYear: parsed.currentYear || now.getFullYear(),
         currentMonth: parsed.currentMonth || now.getMonth() + 1,
       };
@@ -19,6 +20,7 @@ const getInitialState = (): AppState => {
       return {
         transactions: [],
         loans: [],
+        events: [],
         currentYear: now.getFullYear(),
         currentMonth: now.getMonth() + 1,
       };
@@ -27,6 +29,7 @@ const getInitialState = (): AppState => {
   return {
     transactions: [],
     loans: [],
+    events: [],
     currentYear: now.getFullYear(),
     currentMonth: now.getMonth() + 1,
   };
@@ -186,6 +189,42 @@ export function useStore() {
     [state.loans]
   );
 
+  // ==================== 이벤트 관련 ====================
+
+  const addEvent = useCallback((event: LifeEvent) => {
+    setState((prev) => ({
+      ...prev,
+      events: [...prev.events, event],
+    }));
+  }, []);
+
+  const updateEvent = useCallback((id: string, updates: Partial<LifeEvent>) => {
+    setState((prev) => ({
+      ...prev,
+      events: prev.events.map((e) =>
+        e.id === id ? { ...e, ...updates } : e
+      ),
+    }));
+  }, []);
+
+  const deleteEvent = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      events: prev.events.filter((e) => e.id !== id),
+    }));
+  }, []);
+
+  // 특정 월의 이벤트 가져오기
+  const getEventsForMonth = useCallback(
+    (year: number, month: number): LifeEvent[] => {
+      return state.events.filter((e) => {
+        const eventDate = new Date(e.date);
+        return eventDate.getFullYear() === year && eventDate.getMonth() + 1 === month;
+      }).sort((a, b) => a.date.localeCompare(b.date));
+    },
+    [state.events]
+  );
+
   // ==================== 날짜/뷰 관련 ====================
 
   const setCurrentDate = useCallback((year: number, month: number) => {
@@ -314,6 +353,10 @@ export function useStore() {
     updateLoan,
     deleteLoan,
     getLoanPaymentsForMonth,
+    addEvent,
+    updateEvent,
+    deleteEvent,
+    getEventsForMonth,
     setCurrentDate,
     getTransactionsForMonth,
     getMonthSummary,

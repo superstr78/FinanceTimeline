@@ -19,14 +19,30 @@ import {
   MoreHorizontal,
   Trash2,
   Landmark,
+  Star,
+  Calendar,
 } from 'lucide-react';
 import { useApp } from '../../store/AppContext';
-import { CATEGORY_LABELS, RECURRENCE_LABELS, type Transaction, type Category, type LoanPayment } from '../../types';
+import {
+  CATEGORY_LABELS,
+  RECURRENCE_LABELS,
+  EVENT_CATEGORY_LABELS,
+  EVENT_COLOR_CLASSES,
+  EVENT_TEXT_CLASSES,
+  EVENT_BG_CLASSES,
+  EVENT_ICON_BG_CLASSES,
+  EVENT_BADGE_CLASSES,
+  type Transaction,
+  type Category,
+  type LoanPayment,
+  type LifeEvent,
+} from '../../types';
 
 interface MonthBlockProps {
   year: number;
   month: number;
   onEdit: (transaction: Transaction) => void;
+  onEditEvent?: (event: LifeEvent) => void;
 }
 
 const iconMap: Record<Category, React.ReactNode> = {
@@ -46,8 +62,8 @@ const iconMap: Record<Category, React.ReactNode> = {
   other_expense: <MoreHorizontal className="w-4 h-4" />,
 };
 
-export function MonthBlock({ year, month, onEdit }: MonthBlockProps) {
-  const { getTransactionsForMonth, getMonthSummary, deleteTransaction, getLoanPaymentsForMonth } = useApp();
+export function MonthBlock({ year, month, onEdit, onEditEvent }: MonthBlockProps) {
+  const { getTransactionsForMonth, getMonthSummary, deleteTransaction, getLoanPaymentsForMonth, getEventsForMonth, deleteEvent } = useApp();
 
   const transactions = useMemo(
     () => getTransactionsForMonth(year, month),
@@ -57,6 +73,11 @@ export function MonthBlock({ year, month, onEdit }: MonthBlockProps) {
   const loanPayments = useMemo(
     () => getLoanPaymentsForMonth(year, month),
     [getLoanPaymentsForMonth, year, month]
+  );
+
+  const events = useMemo(
+    () => getEventsForMonth(year, month),
+    [getEventsForMonth, year, month]
   );
 
   const summary = useMemo(
@@ -78,22 +99,24 @@ export function MonthBlock({ year, month, onEdit }: MonthBlockProps) {
     return new Date(dateStr).getDate();
   };
 
-  // 거래와 대출 상환을 날짜순으로 정렬
+  // 거래, 대출 상환, 이벤트를 날짜순으로 정렬
   type TimelineItem =
     | { type: 'transaction'; data: Transaction }
-    | { type: 'loan'; data: LoanPayment };
+    | { type: 'loan'; data: LoanPayment }
+    | { type: 'event'; data: LifeEvent };
 
   const timelineItems: TimelineItem[] = useMemo(() => {
     const items: TimelineItem[] = [
       ...transactions.map((t) => ({ type: 'transaction' as const, data: t })),
       ...loanPayments.map((l) => ({ type: 'loan' as const, data: l })),
+      ...events.map((e) => ({ type: 'event' as const, data: e })),
     ];
     return items.sort((a, b) => {
-      const dateA = a.type === 'transaction' ? a.data.date : a.data.date;
-      const dateB = b.type === 'transaction' ? b.data.date : b.data.date;
+      const dateA = a.data.date;
+      const dateB = b.data.date;
       return dateA.localeCompare(dateB);
     });
-  }, [transactions, loanPayments]);
+  }, [transactions, loanPayments, events]);
 
   return (
     <div className="relative">
@@ -204,7 +227,7 @@ export function MonthBlock({ year, month, onEdit }: MonthBlockProps) {
                   </button>
                 </div>
               );
-            } else {
+            } else if (item.type === 'loan') {
               // 대출 상환
               const l = item.data;
               return (
@@ -245,6 +268,65 @@ export function MonthBlock({ year, month, onEdit }: MonthBlockProps) {
                     <p className="font-semibold text-blue-400">{formatAmount(l.totalPayment)}원</p>
                     <p className="text-xs text-rose-400">이자 -{formatAmount(l.interest)}원</p>
                   </div>
+                </div>
+              );
+            } else {
+              // 이벤트
+              const ev = item.data;
+              return (
+                <div
+                  key={`e-${ev.id}`}
+                  className={`group flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer ${EVENT_BG_CLASSES[ev.color]}`}
+                  onClick={() => onEditEvent?.(ev)}
+                >
+                  {/* 날짜 */}
+                  <div className="w-12 text-center">
+                    <span className="text-2xl font-bold text-dark-300">{getDay(ev.date)}</span>
+                    <span className="text-xs text-dark-500 block">일</span>
+                  </div>
+
+                  {/* 구분선 */}
+                  <div className={`w-1 h-12 rounded-full ${EVENT_COLOR_CLASSES[ev.color]}`} />
+
+                  {/* 아이콘 */}
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${EVENT_ICON_BG_CLASSES[ev.color]}`}>
+                    {ev.isImportant ? (
+                      <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    ) : (
+                      <Calendar className={`w-4 h-4 ${EVENT_TEXT_CLASSES[ev.color]}`} />
+                    )}
+                  </div>
+
+                  {/* 내용 */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium text-dark-100 truncate">{ev.title}</h3>
+                      <span className={`px-2 py-0.5 rounded-full text-xs ${EVENT_BADGE_CLASSES[ev.color]}`}>
+                        {EVENT_CATEGORY_LABELS[ev.category]}
+                      </span>
+                      {ev.isImportant && (
+                        <span className="px-2 py-0.5 bg-amber-500/20 rounded-full text-xs text-amber-400">
+                          중요
+                        </span>
+                      )}
+                    </div>
+                    {ev.description && (
+                      <p className="text-sm text-dark-500 truncate">{ev.description}</p>
+                    )}
+                  </div>
+
+                  {/* 삭제 버튼 */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm('이 이벤트를 삭제하시겠습니까?')) {
+                        deleteEvent(ev.id);
+                      }
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-2 text-dark-500 hover:text-rose-400 transition-all"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               );
             }
