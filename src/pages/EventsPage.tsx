@@ -39,19 +39,6 @@ export function EventsPage() {
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [events, filterCategory, searchQuery]);
 
-  // 카테고리별 통계
-  const stats = useMemo(() => {
-    const categoryCounts: Record<string, number> = {};
-    let importantCount = 0;
-
-    events.forEach((e) => {
-      categoryCounts[e.category] = (categoryCounts[e.category] || 0) + 1;
-      if (e.isImportant) importantCount++;
-    });
-
-    return { categoryCounts, importantCount, total: events.length };
-  }, [events]);
-
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
@@ -82,18 +69,6 @@ export function EventsPage() {
 
   return (
     <div className="space-y-4 lg:space-y-6">
-      {/* 요약 카드 */}
-      <div className="grid grid-cols-2 gap-2 lg:gap-4">
-        <div className="card !p-3 lg:!p-6">
-          <p className="text-dark-400 text-xs lg:text-sm mb-1">전체</p>
-          <p className="text-xl lg:text-2xl font-bold text-dark-100">{stats.total}개</p>
-        </div>
-        <div className="card !p-3 lg:!p-6">
-          <p className="text-dark-400 text-xs lg:text-sm mb-1">중요</p>
-          <p className="text-xl lg:text-2xl font-bold text-amber-400">{stats.importantCount}개</p>
-        </div>
-      </div>
-
       {/* 툴바 */}
       <div className="space-y-3">
         {/* 검색 + 추가 버튼 */}
