@@ -59,6 +59,27 @@ npm run deploy
 - 변경사항은 항상 git에 푸시하고 GitHub Pages에 자동 배포
 - 배포 URL: https://yongwoo-ahn.github.io/plan-my-life/
 
+## 기능 변경 시 도움말 업데이트 (필수)
+
+**기능 추가/변경/삭제 시 반드시 도움말 페이지도 함께 업데이트:**
+
+- 도움말 파일: `src/pages/HelpPage.tsx`
+- `helpSections` 배열에 해당 기능 설명 추가/수정
+- `tips` 배열에 활용 팁 추가 (필요시)
+
+**도움말 섹션 구조:**
+```typescript
+{
+  id: 'section-id',
+  icon: <Icon className="w-5 h-5" />,
+  title: '기능 제목',
+  description: '기능 요약 설명',
+  details: [
+    { subtitle: '세부 기능', content: '상세 설명' },
+  ],
+}
+```
+
 ## Architecture
 
 ```
