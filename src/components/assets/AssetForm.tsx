@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useApp } from '../../store/AppContext';
+import { DatePicker } from '../common/DatePicker';
 import {
   ASSET_CATEGORY_LABELS,
   type Asset,
@@ -156,11 +157,9 @@ export function AssetForm({ asset, onClose }: AssetFormProps) {
             <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">
               취득일
             </label>
-            <input
-              type="date"
+            <DatePicker
               value={purchaseDate}
-              onChange={(e) => setPurchaseDate(e.target.value)}
-              className="input text-sm lg:text-base"
+              onChange={setPurchaseDate}
               placeholder="선택사항"
             />
           </div>

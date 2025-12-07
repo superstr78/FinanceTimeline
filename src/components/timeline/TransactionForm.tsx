@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useApp } from '../../store/AppContext';
+import { DatePicker } from '../common/DatePicker';
 import {
   CATEGORY_LABELS,
   INCOME_CATEGORIES,
@@ -172,11 +173,10 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
             </div>
             <div>
               <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">날짜 *</label>
-              <input
-                type="date"
+              <DatePicker
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="input text-sm lg:text-base"
+                onChange={setDate}
+                placeholder="날짜 선택"
               />
             </div>
           </div>
@@ -203,11 +203,10 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
               <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">
                 반복 종료일 (선택)
               </label>
-              <input
-                type="date"
+              <DatePicker
                 value={recurrenceEndDate}
-                onChange={(e) => setRecurrenceEndDate(e.target.value)}
-                className="input text-sm lg:text-base"
+                onChange={setRecurrenceEndDate}
+                placeholder="종료일 선택"
               />
               <p className="text-[10px] lg:text-xs text-dark-500 mt-1">비워두면 무기한 반복</p>
             </div>

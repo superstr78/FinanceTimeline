@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, HelpCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useApp } from '../../store/AppContext';
+import { DatePicker } from '../common/DatePicker';
 import {
   REPAYMENT_TYPE_LABELS,
   REPAYMENT_TYPE_DESC,
@@ -236,11 +237,10 @@ export function LoanForm({ loan, onClose }: LoanFormProps) {
               <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">
                 대출 시작일 *
               </label>
-              <input
-                type="date"
+              <DatePicker
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="input text-sm lg:text-base"
+                onChange={setStartDate}
+                placeholder="시작일 선택"
               />
             </div>
             <div>

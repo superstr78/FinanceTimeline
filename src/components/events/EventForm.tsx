@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Star } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useApp } from '../../store/AppContext';
+import { DatePicker } from '../common/DatePicker';
 import {
   EVENT_CATEGORY_LABELS,
   EVENT_COLOR_CLASSES,
@@ -115,11 +116,10 @@ export function EventForm({ event, onClose }: EventFormProps) {
               <label className="block text-xs lg:text-sm font-medium text-dark-300 mb-1.5 lg:mb-2">
                 날짜 *
               </label>
-              <input
-                type="date"
+              <DatePicker
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="input text-sm lg:text-base"
+                onChange={setDate}
+                placeholder="날짜 선택"
               />
             </div>
           </div>
