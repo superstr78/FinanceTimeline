@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Calendar, CalendarDays, Flag, ChevronLeft, ChevronRight, Home } from 'lucide-react';
+import { Calendar, CalendarDays, Flag, Home } from 'lucide-react';
 import { useApp } from '../store/AppContext';
 import { MonthBlock } from '../components/timeline/MonthBlock';
 import { YearBlock } from '../components/timeline/YearBlock';
@@ -42,26 +42,16 @@ export function TimelinePage() {
     setEditingEvent(null);
   };
 
-  // 날짜 네비게이션
-  const handlePrevMonth = () => {
-    if (currentMonth === 1) {
-      setCurrentDate(currentYear - 1, 12);
-    } else {
-      setCurrentDate(currentYear, currentMonth - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (currentMonth === 12) {
-      setCurrentDate(currentYear + 1, 1);
-    } else {
-      setCurrentDate(currentYear, currentMonth + 1);
-    }
-  };
-
+  // 오늘로 이동
   const handleToday = () => {
     const now = new Date();
     setCurrentDate(now.getFullYear(), now.getMonth() + 1);
+  };
+
+  // 현재 날짜가 오늘인지 확인
+  const isToday = () => {
+    const now = new Date();
+    return currentYear === now.getFullYear() && currentMonth === now.getMonth() + 1;
   };
 
   // 무한 스크롤 감지
@@ -129,9 +119,8 @@ export function TimelinePage() {
 
   return (
     <div className="space-y-4">
-      {/* 툴바: 뷰 모드, 날짜 네비게이션, 이벤트 추가 */}
-      <div className="sticky top-0 z-20 bg-dark-950 py-3 space-y-3">
-        {/* 상단: 뷰 모드 토글 및 이벤트 추가 */}
+      {/* 툴바: 뷰 모드, 오늘 이동, 이벤트 추가 */}
+      <div className="sticky top-0 z-20 bg-dark-950 py-3">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <button
@@ -156,6 +145,16 @@ export function TimelinePage() {
               <CalendarDays className="w-4 h-4" />
               연도별 보기
             </button>
+            {/* 오늘이 아닐 때만 '오늘' 버튼 표시 */}
+            {!isToday() && (
+              <button
+                onClick={handleToday}
+                className="btn bg-blue-500/20 text-blue-400 border border-blue-500/40 hover:bg-blue-500/30"
+              >
+                <Home className="w-4 h-4" />
+                오늘
+              </button>
+            )}
           </div>
           <button
             onClick={() => setShowEventForm(true)}
@@ -163,28 +162,6 @@ export function TimelinePage() {
           >
             <Flag className="w-4 h-4" />
             이벤트 추가
-          </button>
-        </div>
-
-        {/* 하단: 날짜 네비게이션 */}
-        <div className="flex items-center justify-center gap-3">
-          <button onClick={handlePrevMonth} className="btn btn-ghost p-2">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <div className="flex items-center gap-3">
-            <span className="text-lg font-bold text-dark-100 min-w-[120px] text-center">
-              {currentYear}년 {currentMonth}월
-            </span>
-            <button
-              onClick={handleToday}
-              className="btn btn-secondary text-sm py-1.5 px-3"
-            >
-              <Home className="w-4 h-4" />
-              오늘
-            </button>
-          </div>
-          <button onClick={handleNextMonth} className="btn btn-ghost p-2">
-            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </div>
