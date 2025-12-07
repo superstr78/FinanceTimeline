@@ -1,13 +1,34 @@
-import { Home, Menu } from 'lucide-react';
+import { Home, Menu, Loader2, Cloud } from 'lucide-react';
 
 interface HeaderProps {
   title: string;
   onTodayClick?: () => void;
   showTodayButton?: boolean;
   onMenuClick: () => void;
+  isSyncing?: boolean;
+  isLoggedIn?: boolean;
+  lastSyncTime?: Date | null;
 }
 
-export function Header({ title, onTodayClick, showTodayButton, onMenuClick }: HeaderProps) {
+export function Header({
+  title,
+  onTodayClick,
+  showTodayButton,
+  onMenuClick,
+  isSyncing,
+  isLoggedIn,
+  lastSyncTime
+}: HeaderProps) {
+  const formatLastSyncTime = (date: Date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
+
   return (
     <header className="sticky top-0 z-30 h-14 lg:h-16 bg-dark-900/95 backdrop-blur-sm border-b border-dark-800 flex items-center px-4 lg:px-6">
       {/* 모바일 메뉴 버튼 */}
@@ -30,6 +51,30 @@ export function Header({ title, onTodayClick, showTodayButton, onMenuClick }: He
           </button>
         )}
       </div>
+
+      {/* 동기화 상태 (로그인 상태에서만 표시) */}
+      {isLoggedIn && (
+        <div className="flex flex-col items-end text-xs px-2 lg:px-3 py-1">
+          <div className="flex items-center gap-1.5">
+            {isSyncing ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                <span className="text-blue-400">저장 중...</span>
+              </>
+            ) : (
+              <>
+                <Cloud className="w-4 h-4 text-emerald-400" />
+                <span className="text-emerald-400">자동 저장</span>
+              </>
+            )}
+          </div>
+          {lastSyncTime && !isSyncing && (
+            <span className="text-[10px] text-dark-500 mt-0.5">
+              {formatLastSyncTime(lastSyncTime)}
+            </span>
+          )}
+        </div>
+      )}
     </header>
   );
 }

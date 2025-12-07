@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import type { Transaction, AppState, MonthSummary, Loan, LoanPayment, LifeEvent } from '../types';
+import type { Transaction, AppState, MonthSummary, Loan, LoanPayment, LifeEvent, Asset } from '../types';
 
 const STORAGE_KEY = 'finance-timeline-data';
 
@@ -15,6 +15,7 @@ const getInitialState = (): AppState => {
         transactions: parsed.transactions || [],
         loans: parsed.loans || [],
         events: parsed.events || [],
+        assets: parsed.assets || [],
         currentYear: parsed.currentYear || now.getFullYear(),
         currentMonth: parsed.currentMonth || now.getMonth() + 1,
       };
@@ -23,6 +24,7 @@ const getInitialState = (): AppState => {
         transactions: [],
         loans: [],
         events: [],
+        assets: [],
         currentYear: now.getFullYear(),
         currentMonth: now.getMonth() + 1,
       };
@@ -32,6 +34,7 @@ const getInitialState = (): AppState => {
     transactions: [],
     loans: [],
     events: [],
+    assets: [],
     currentYear: now.getFullYear(),
     currentMonth: now.getMonth() + 1,
   };
@@ -124,10 +127,28 @@ function getLoanPaymentForMonth(loan: Loan, targetYear: number, targetMonth: num
   };
 }
 
+// undefined 값을 제거하는 헬퍼 함수
+function removeUndefined<T>(obj: T): T {
+  if (Array.isArray(obj)) {
+    return obj.map(item => removeUndefined(item)) as T;
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        result[key] = removeUndefined(value);
+      }
+    }
+    return result as T;
+  }
+  return obj;
+}
+
 export function useStore(userId?: string | null) {
   const [state, setState] = useState<AppState>(getInitialState);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
+  const [isInitialLoadDone, setIsInitialLoadDone] = useState(false);
 
   // localStorage에 저장
   useEffect(() => {
@@ -136,7 +157,10 @@ export function useStore(userId?: string | null) {
 
   // Firestore에서 데이터 로드 (로그인 시)
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      setIsInitialLoadDone(false);
+      return;
+    }
 
     const loadFromFirestore = async () => {
       try {
@@ -146,19 +170,21 @@ export function useStore(userId?: string | null) {
 
         if (docSnap.exists()) {
           const data = docSnap.data() as AppState;
-          setState({
+          setState((prev) => ({
             transactions: data.transactions || [],
             loans: data.loans || [],
             events: data.events || [],
-            currentYear: state.currentYear,
-            currentMonth: state.currentMonth,
-          });
+            assets: data.assets || [],
+            currentYear: prev.currentYear,
+            currentMonth: prev.currentMonth,
+          }));
           setLastSyncTime(new Date());
         }
       } catch (error) {
         console.error('Firestore 로드 실패:', error);
       } finally {
         setIsSyncing(false);
+        setIsInitialLoadDone(true);
       }
     };
 
@@ -167,36 +193,41 @@ export function useStore(userId?: string | null) {
 
   // Firestore에 데이터 저장
   const saveToFirestore = useCallback(async () => {
-    if (!userId) return;
+    if (!userId) {
+      return;
+    }
 
     try {
       setIsSyncing(true);
       const docRef = doc(db, 'users', userId);
-      await setDoc(docRef, {
+      // undefined 값 제거 후 저장
+      const dataToSave = removeUndefined({
         transactions: state.transactions,
         loans: state.loans,
         events: state.events,
+        assets: state.assets,
         updatedAt: new Date().toISOString(),
       });
+      await setDoc(docRef, dataToSave);
       setLastSyncTime(new Date());
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Firestore 저장 실패:', error);
       throw error;
     } finally {
       setIsSyncing(false);
     }
-  }, [userId, state.transactions, state.loans, state.events]);
+  }, [userId, state.transactions, state.loans, state.events, state.assets]);
 
-  // 데이터 변경 시 자동 저장 (debounce)
+  // 데이터 변경 시 자동 저장 (debounce) - 초기 로드 후에만 작동
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !isInitialLoadDone) return;
 
     const timeoutId = setTimeout(() => {
       saveToFirestore();
-    }, 2000); // 2초 후 자동 저장
+    }, 1000); // 1초 후 자동 저장
 
     return () => clearTimeout(timeoutId);
-  }, [userId, state.transactions, state.loans, state.events, saveToFirestore]);
+  }, [userId, isInitialLoadDone, state.transactions, state.loans, state.events, state.assets, saveToFirestore]);
 
   // ==================== 거래 관련 ====================
 
@@ -293,6 +324,61 @@ export function useStore(userId?: string | null) {
     },
     [state.events]
   );
+
+  // ==================== 자산 관련 ====================
+
+  const addAsset = useCallback((asset: Asset) => {
+    setState((prev) => ({
+      ...prev,
+      assets: [...prev.assets, asset],
+    }));
+  }, []);
+
+  const updateAsset = useCallback((id: string, updates: Partial<Asset>) => {
+    setState((prev) => ({
+      ...prev,
+      assets: prev.assets.map((a) =>
+        a.id === id ? { ...a, ...updates } : a
+      ),
+    }));
+  }, []);
+
+  const deleteAsset = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      assets: prev.assets.filter((a) => a.id !== id),
+    }));
+  }, []);
+
+  // 총 자산 가치 계산
+  const getTotalAssetValue = useCallback((): number => {
+    return state.assets.reduce((sum, asset) => sum + asset.currentValue, 0);
+  }, [state.assets]);
+
+  // 총 대출 잔액 계산
+  const getTotalLoanBalance = useCallback((): number => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+
+    return state.loans.reduce((sum, loan) => {
+      const payment = getLoanPaymentForMonth(loan, currentYear, currentMonth);
+      if (payment) {
+        return sum + payment.remainingPrincipal + payment.principal;
+      }
+      // 아직 시작 안 했거나 완료된 대출
+      const startDate = new Date(loan.startDate);
+      if (now < startDate) {
+        return sum + loan.principal;
+      }
+      return sum;
+    }, 0);
+  }, [state.loans]);
+
+  // 순자산 계산 (자산 - 부채)
+  const getNetWorth = useCallback((): number => {
+    return getTotalAssetValue() - getTotalLoanBalance();
+  }, [getTotalAssetValue, getTotalLoanBalance]);
 
   // ==================== 날짜/뷰 관련 ====================
 
@@ -429,6 +515,12 @@ export function useStore(userId?: string | null) {
     updateEvent,
     deleteEvent,
     getEventsForMonth,
+    addAsset,
+    updateAsset,
+    deleteAsset,
+    getTotalAssetValue,
+    getTotalLoanBalance,
+    getNetWorth,
     setCurrentDate,
     getTransactionsForMonth,
     getMonthSummary,

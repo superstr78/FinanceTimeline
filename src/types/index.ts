@@ -46,6 +46,7 @@ export interface AppState {
   transactions: Transaction[];
   loans: Loan[];
   events: LifeEvent[];
+  assets: Asset[];
   currentYear: number;
   currentMonth: number;
 }
@@ -239,4 +240,45 @@ export const EVENT_BADGE_CLASSES: Record<EventColor, string> = {
   blue: 'bg-blue-500/20 text-blue-400',
   purple: 'bg-purple-500/20 text-purple-400',
   pink: 'bg-pink-500/20 text-pink-400',
+};
+
+// ==================== 자산 관련 타입 ====================
+
+// 자산 카테고리
+export type AssetCategory =
+  | 'real_estate'    // 부동산
+  | 'vehicle'        // 자동차
+  | 'savings'        // 예금/적금
+  | 'investment'     // 투자 (주식, 펀드 등)
+  | 'other_asset';   // 기타 자산
+
+// 자산 인터페이스
+export interface Asset {
+  id: string;
+  name: string;                 // 자산명 (예: 아파트, 자동차)
+  category: AssetCategory;
+  purchaseValue?: number;       // 취득가액 - 선택사항
+  currentValue: number;         // 현재 가치 (시가)
+  purchaseDate?: string;        // 취득일 (YYYY-MM-DD) - 선택사항
+  description?: string;         // 상세 설명
+  memo?: string;
+  createdAt: string;
+}
+
+// 자산 카테고리 라벨
+export const ASSET_CATEGORY_LABELS: Record<AssetCategory, string> = {
+  real_estate: '부동산',
+  vehicle: '자동차',
+  savings: '예금/적금',
+  investment: '투자',
+  other_asset: '기타 자산',
+};
+
+// 자산 카테고리 아이콘
+export const ASSET_CATEGORY_ICONS: Record<AssetCategory, string> = {
+  real_estate: 'Building2',
+  vehicle: 'Car',
+  savings: 'PiggyBank',
+  investment: 'TrendingUp',
+  other_asset: 'Package',
 };

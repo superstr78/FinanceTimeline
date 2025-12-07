@@ -8,6 +8,7 @@ import {
   Flag,
   HelpCircle,
   X,
+  Building2,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -17,14 +18,31 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-const menuItems = [
-  { id: 'timeline', icon: Calendar, label: '타임라인' },
-  { id: 'transactions', icon: Receipt, label: '수입/지출' },
-  { id: 'events', icon: Flag, label: '이벤트' },
-  { id: 'loans', icon: Landmark, label: '대출 관리' },
-  { id: 'summary', icon: LayoutDashboard, label: '요약' },
-  { id: 'settings', icon: Settings, label: '설정' },
-  { id: 'help', icon: HelpCircle, label: '도움말' },
+// 메뉴 그룹 정의
+const menuGroups = [
+  {
+    label: '보기',
+    items: [
+      { id: 'timeline', icon: Calendar, label: '타임라인' },
+      { id: 'summary', icon: LayoutDashboard, label: '요약' },
+    ],
+  },
+  {
+    label: '관리',
+    items: [
+      { id: 'transactions', icon: Receipt, label: '수입/지출' },
+      { id: 'events', icon: Flag, label: '이벤트' },
+      { id: 'loans', icon: Landmark, label: '대출 관리' },
+      { id: 'assets', icon: Building2, label: '자산 관리' },
+    ],
+  },
+  {
+    label: '기타',
+    items: [
+      { id: 'settings', icon: Settings, label: '설정' },
+      { id: 'help', icon: HelpCircle, label: '도움말' },
+    ],
+  },
 ];
 
 export function Sidebar({ activeTab, onTabChange, isOpen, onClose }: SidebarProps) {
@@ -70,25 +88,36 @@ export function Sidebar({ activeTab, onTabChange, isOpen, onClose }: SidebarProp
           </div>
         </div>
 
-        <nav className="flex-1 p-3 lg:p-4 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleTabChange(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                  isActive
-                    ? 'bg-violet-500/10 text-violet-400 border border-violet-500/20'
-                    : 'text-dark-400 hover:text-dark-100 hover:bg-dark-800/50'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="font-medium">{item.label}</span>
-              </button>
-            );
-          })}
+        <nav className="flex-1 p-3 lg:p-4 overflow-y-auto">
+          {menuGroups.map((group, groupIndex) => (
+            <div key={group.label} className={groupIndex > 0 ? 'mt-4 pt-4 border-t border-dark-800' : ''}>
+              {/* 그룹 라벨 */}
+              <p className="px-4 mb-2 text-[10px] lg:text-xs font-semibold text-dark-500 uppercase tracking-wider">
+                {group.label}
+              </p>
+              {/* 그룹 아이템 */}
+              <div className="space-y-1">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleTabChange(item.id)}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 lg:py-3 rounded-xl transition-all duration-200 ${
+                        isActive
+                          ? 'bg-violet-500/10 text-violet-400 border border-violet-500/20'
+                          : 'text-dark-400 hover:text-dark-100 hover:bg-dark-800/50'
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span className="font-medium text-sm lg:text-base">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         <div className="p-3 lg:p-4 border-t border-dark-800 hidden lg:block">

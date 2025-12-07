@@ -14,6 +14,7 @@ import {
   Cloud,
   Smartphone,
   HelpCircle,
+  Building2,
 } from 'lucide-react';
 
 interface HelpSection {
@@ -121,6 +122,30 @@ const helpSections: HelpSection[] = [
       {
         subtitle: '예상 월 상환액',
         content: '대출 등록 시 예상 월 상환액을 미리 확인할 수 있어 상환 계획을 세우는 데 도움이 됩니다.',
+      },
+    ],
+  },
+  {
+    id: 'assets',
+    icon: <Building2 className="w-5 h-5" />,
+    title: '자산 관리',
+    description: '부동산, 자동차, 예금 등 보유 자산을 등록하고 순자산을 계산합니다.',
+    details: [
+      {
+        subtitle: '자산 카테고리',
+        content: '• 부동산: 아파트, 주택, 토지 등\n• 자동차: 승용차, SUV 등\n• 예금/적금: 은행 예금, 적금 등\n• 투자: 주식, 펀드, ETF 등\n• 기타 자산: 귀금속, 예술품 등',
+      },
+      {
+        subtitle: '취득가 vs 현재 가치',
+        content: '취득가(구매 가격)와 현재 가치(시가)를 별도로 입력하여 자산 가치 변동을 추적할 수 있습니다.',
+      },
+      {
+        subtitle: '순자산 계산',
+        content: '순자산 = 총 자산 - 총 부채(대출 잔액). 요약 페이지에서 순자산 현황을 확인할 수 있습니다.',
+      },
+      {
+        subtitle: '활용 팁',
+        content: '부동산 시세가 변동되면 현재 가치를 업데이트하여 실시간 순자산을 파악하세요.',
       },
     ],
   },

@@ -1,9 +1,14 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
-import { TrendingUp, TrendingDown, Wallet, Flag, Target } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Flag, Target, Building2, Landmark } from 'lucide-react';
 import { useApp } from '../store/AppContext';
 
 export function SummaryPage() {
-  const { currentYear, currentMonth, getMultiMonthSummaries, transactions, events } = useApp();
+  const { currentYear, currentMonth, getMultiMonthSummaries, transactions, events, getTotalAssetValue, getTotalLoanBalance, getNetWorth, assets } = useApp();
+
+  // 순자산 계산
+  const totalAssetValue = getTotalAssetValue();
+  const totalLoanBalance = getTotalLoanBalance();
+  const netWorth = getNetWorth();
 
   // 장기 지출 전망 계산 (5년 단위로 30년까지)
   const longTermExpenses = useMemo(() => {
@@ -115,6 +120,67 @@ export function SummaryPage() {
 
   return (
     <div className="space-y-6 lg:space-y-8">
+      {/* 순자산 현황 */}
+      {(totalAssetValue > 0 || totalLoanBalance > 0) && (
+        <div className="card !p-4 lg:!p-6 bg-gradient-to-br from-blue-500/5 to-violet-500/5 border-blue-500/20">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+              <Wallet className="w-5 h-5 text-blue-400" />
+            </div>
+            <div>
+              <h2 className="text-base lg:text-lg font-bold text-dark-100">순자산 현황</h2>
+              <p className="text-xs lg:text-sm text-dark-400">
+                자산 - 부채 = 순자산
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4">
+            {/* 총 자산 */}
+            <div className="p-4 bg-dark-800/50 rounded-xl border border-dark-700">
+              <div className="flex items-center gap-2 mb-2">
+                <Building2 className="w-4 h-4 text-emerald-400" />
+                <p className="text-xs lg:text-sm text-dark-400">총 자산</p>
+              </div>
+              <p className="text-lg lg:text-2xl font-bold text-emerald-400">
+                {formatAmount(totalAssetValue)}원
+              </p>
+              <p className="text-[10px] lg:text-xs text-dark-500 mt-1">
+                {assets.length}개 자산 등록됨
+              </p>
+            </div>
+
+            {/* 총 부채 */}
+            <div className="p-4 bg-dark-800/50 rounded-xl border border-dark-700">
+              <div className="flex items-center gap-2 mb-2">
+                <Landmark className="w-4 h-4 text-rose-400" />
+                <p className="text-xs lg:text-sm text-dark-400">총 부채 (대출 잔액)</p>
+              </div>
+              <p className="text-lg lg:text-2xl font-bold text-rose-400">
+                {formatAmount(totalLoanBalance)}원
+              </p>
+              <p className="text-[10px] lg:text-xs text-dark-500 mt-1">
+                현재 남은 대출 원금
+              </p>
+            </div>
+
+            {/* 순자산 */}
+            <div className={`p-4 rounded-xl border ${netWorth >= 0 ? 'bg-blue-500/10 border-blue-500/30' : 'bg-amber-500/10 border-amber-500/30'}`}>
+              <div className="flex items-center gap-2 mb-2">
+                <Wallet className="w-4 h-4 text-blue-400" />
+                <p className="text-xs lg:text-sm text-dark-400">순자산</p>
+              </div>
+              <p className={`text-lg lg:text-2xl font-bold ${netWorth >= 0 ? 'text-blue-400' : 'text-amber-400'}`}>
+                {netWorth < 0 && '-'}{formatAmount(Math.abs(netWorth))}원
+              </p>
+              <p className="text-[10px] lg:text-xs text-dark-500 mt-1">
+                자산 - 부채
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 장기 재정 전망 */}
       <div className="card !p-4 lg:!p-6">
         <div className="flex items-center gap-3 mb-4">

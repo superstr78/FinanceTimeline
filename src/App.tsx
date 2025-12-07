@@ -8,6 +8,7 @@ import { TimelinePage } from './pages/TimelinePage';
 import { TransactionsPage } from './pages/TransactionsPage';
 import { EventsPage } from './pages/EventsPage';
 import { LoansPage } from './pages/LoansPage';
+import { AssetsPage } from './pages/AssetsPage';
 import { SummaryPage } from './pages/SummaryPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { HelpPage } from './pages/HelpPage';
@@ -19,6 +20,7 @@ const PAGE_TITLES: Record<string, string> = {
   transactions: '수입/지출 관리',
   events: '이벤트 관리',
   loans: '대출 관리',
+  assets: '자산 관리',
   summary: '요약',
   settings: '설정',
   help: '도움말',
@@ -27,7 +29,8 @@ const PAGE_TITLES: Record<string, string> = {
 function AppContent() {
   const [activeTab, setActiveTab] = useState('timeline');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { setCurrentDate } = useApp();
+  const { setCurrentDate, isSyncing, lastSyncTime } = useApp();
+  const { user } = useAuth();
 
   const renderPage = () => {
     switch (activeTab) {
@@ -39,6 +42,8 @@ function AppContent() {
         return <EventsPage />;
       case 'loans':
         return <LoansPage />;
+      case 'assets':
+        return <AssetsPage />;
       case 'summary':
         return <SummaryPage />;
       case 'settings':
@@ -74,6 +79,9 @@ function AppContent() {
           onTodayClick={handleToday}
           showTodayButton={showTodayButton}
           onMenuClick={() => setSidebarOpen(true)}
+          isSyncing={isSyncing}
+          isLoggedIn={!!user}
+          lastSyncTime={lastSyncTime}
         />
         <div className="p-4 lg:p-6">{renderPage()}</div>
       </main>
