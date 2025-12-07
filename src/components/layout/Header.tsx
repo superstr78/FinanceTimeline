@@ -1,15 +1,14 @@
-import { Plus, Home } from 'lucide-react';
+import { Home } from 'lucide-react';
 
 interface HeaderProps {
   title: string;
-  onAddClick?: () => void;
   onTodayClick?: () => void;
   showTodayButton?: boolean;
 }
 
-export function Header({ title, onAddClick, onTodayClick, showTodayButton }: HeaderProps) {
+export function Header({ title, onTodayClick, showTodayButton }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 h-16 bg-dark-900/95 backdrop-blur-sm border-b border-dark-800 flex items-center justify-between px-6">
+    <header className="sticky top-0 z-30 h-16 bg-dark-900/95 backdrop-blur-sm border-b border-dark-800 flex items-center px-6">
       <div className="flex items-center gap-3">
         <h2 className="text-xl font-semibold text-dark-100">{title}</h2>
         {showTodayButton && onTodayClick && (
@@ -22,13 +21,6 @@ export function Header({ title, onAddClick, onTodayClick, showTodayButton }: Hea
           </button>
         )}
       </div>
-
-      {onAddClick && (
-        <button onClick={onAddClick} className="btn bg-emerald-500 hover:bg-emerald-600 text-white">
-          <Plus className="w-5 h-5" />
-          거래 추가
-        </button>
-      )}
     </header>
   );
 }

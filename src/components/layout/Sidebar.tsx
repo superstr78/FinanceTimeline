@@ -4,6 +4,7 @@ import {
   Settings,
   Banknote,
   Landmark,
+  Receipt,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -13,6 +14,7 @@ interface SidebarProps {
 
 const menuItems = [
   { id: 'timeline', icon: Calendar, label: '타임라인' },
+  { id: 'transactions', icon: Receipt, label: '수입/지출' },
   { id: 'loans', icon: Landmark, label: '대출 관리' },
   { id: 'summary', icon: LayoutDashboard, label: '요약' },
   { id: 'settings', icon: Settings, label: '설정' },

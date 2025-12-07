@@ -3,13 +3,14 @@ import { AppProvider, useApp } from './store/AppContext';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { TimelinePage } from './pages/TimelinePage';
+import { TransactionsPage } from './pages/TransactionsPage';
 import { LoansPage } from './pages/LoansPage';
 import { SummaryPage } from './pages/SummaryPage';
 import { SettingsPage } from './pages/SettingsPage';
-import { TransactionForm } from './components/timeline/TransactionForm';
 
 const PAGE_TITLES: Record<string, string> = {
   timeline: '타임라인',
+  transactions: '수입/지출 관리',
   loans: '대출 관리',
   summary: '요약',
   settings: '설정',
@@ -17,13 +18,14 @@ const PAGE_TITLES: Record<string, string> = {
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('timeline');
-  const [showAddForm, setShowAddForm] = useState(false);
   const { setCurrentDate } = useApp();
 
   const renderPage = () => {
     switch (activeTab) {
       case 'timeline':
         return <TimelinePage />;
+      case 'transactions':
+        return <TransactionsPage />;
       case 'loans':
         return <LoansPage />;
       case 'summary':
@@ -34,9 +36,6 @@ function AppContent() {
         return <TimelinePage />;
     }
   };
-
-  // 거래 추가 버튼은 타임라인과 요약 페이지에서만 표시
-  const showAddButton = activeTab === 'timeline' || activeTab === 'summary';
 
   // 오늘로 이동
   const handleToday = () => {
@@ -54,16 +53,11 @@ function AppContent() {
       <main className="ml-64 min-h-screen">
         <Header
           title={PAGE_TITLES[activeTab]}
-          onAddClick={showAddButton ? () => setShowAddForm(true) : undefined}
           onTodayClick={handleToday}
           showTodayButton={showTodayButton}
         />
         <div className="p-6">{renderPage()}</div>
       </main>
-
-      {showAddForm && (
-        <TransactionForm onClose={() => setShowAddForm(false)} />
-      )}
     </div>
   );
 }
