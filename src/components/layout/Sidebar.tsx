@@ -59,28 +59,30 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         </div>
       </div>
 
-      {/* 월 네비게이션 */}
-      <div className="p-4 border-b border-dark-800">
-        <div className="flex items-center justify-between mb-3">
-          <button onClick={handlePrevMonth} className="btn btn-ghost p-2">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <div className="text-center">
-            <span className="text-lg font-bold text-dark-100">
-              {currentYear}년 {currentMonth}월
-            </span>
+      {/* 월 네비게이션 - 타임라인 탭에서만 표시 */}
+      {activeTab === 'timeline' && (
+        <div className="p-4 border-b border-dark-800">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={handlePrevMonth} className="btn btn-ghost p-2">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <div className="text-center">
+              <span className="text-lg font-bold text-dark-100">
+                {currentYear}년 {currentMonth}월
+              </span>
+            </div>
+            <button onClick={handleNextMonth} className="btn btn-ghost p-2">
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
-          <button onClick={handleNextMonth} className="btn btn-ghost p-2">
-            <ChevronRight className="w-4 h-4" />
+          <button
+            onClick={handleToday}
+            className="w-full btn btn-secondary text-sm"
+          >
+            오늘로 이동
           </button>
         </div>
-        <button
-          onClick={handleToday}
-          className="w-full btn btn-secondary text-sm"
-        >
-          오늘로 이동
-        </button>
-      </div>
+      )}
 
       <nav className="flex-1 p-4 space-y-1">
         {menuItems.map((item) => {

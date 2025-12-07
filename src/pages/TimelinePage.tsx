@@ -155,6 +155,7 @@ export function TimelinePage() {
               key={year}
               year={year}
               onEdit={handleEdit}
+              onEditEvent={handleEditEvent}
             />
           ))
         )}

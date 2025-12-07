@@ -1,15 +1,22 @@
 import { useMemo, useState } from 'react';
-import { TrendingUp, TrendingDown, ChevronDown, ChevronUp } from 'lucide-react';
+import { TrendingUp, TrendingDown, ChevronDown, ChevronUp, Star, Flag } from 'lucide-react';
 import { useApp } from '../../store/AppContext';
-import type { Transaction } from '../../types';
+import {
+  EVENT_COLOR_CLASSES,
+  EVENT_CATEGORY_LABELS,
+  EVENT_BG_CLASSES,
+  type Transaction,
+  type LifeEvent,
+} from '../../types';
 
 interface YearBlockProps {
   year: number;
   onEdit: (transaction: Transaction) => void;
+  onEditEvent?: (event: LifeEvent) => void;
 }
 
-export function YearBlock({ year, onEdit }: YearBlockProps) {
-  const { getMultiMonthSummaries, getTransactionsForMonth } = useApp();
+export function YearBlock({ year, onEdit, onEditEvent }: YearBlockProps) {
+  const { getMultiMonthSummaries, getTransactionsForMonth, getEventsForMonth, events } = useApp();
   const [expandedMonth, setExpandedMonth] = useState<number | null>(null);
 
   // 해당 연도 12개월 요약
@@ -29,6 +36,22 @@ export function YearBlock({ year, onEdit }: YearBlockProps) {
       { income: 0, expense: 0, balance: 0 }
     );
   }, [monthlySummaries]);
+
+  // 해당 연도의 이벤트 수
+  const yearEvents = useMemo(() => {
+    return events.filter((e) => {
+      const eventYear = new Date(e.date).getFullYear();
+      return eventYear === year;
+    });
+  }, [events, year]);
+
+  // 월별 이벤트 수 계산
+  const getEventCountForMonth = (month: number) => {
+    return events.filter((e) => {
+      const eventDate = new Date(e.date);
+      return eventDate.getFullYear() === year && eventDate.getMonth() + 1 === month;
+    }).length;
+  };
 
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('ko-KR').format(amount);
@@ -52,7 +75,15 @@ export function YearBlock({ year, onEdit }: YearBlockProps) {
     <div className="card">
       {/* 연도 헤더 */}
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-dark-800">
-        <h2 className="text-2xl font-bold text-dark-100">{year}년</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-dark-100">{year}년</h2>
+          {yearEvents.length > 0 && (
+            <span className="flex items-center gap-1 px-2 py-1 bg-purple-500/20 rounded-full text-xs text-purple-400">
+              <Flag className="w-3 h-3" />
+              {yearEvents.length}개 이벤트
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-6 text-sm">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-emerald-400" />
@@ -79,7 +110,9 @@ export function YearBlock({ year, onEdit }: YearBlockProps) {
         {monthlySummaries.map((summary) => {
           const isExpanded = expandedMonth === summary.month;
           const transactions = isExpanded ? getTransactionsForMonth(year, summary.month) : [];
-          const hasData = summary.totalIncome > 0 || summary.totalExpense > 0;
+          const monthEvents = isExpanded ? getEventsForMonth(year, summary.month) : [];
+          const eventCount = getEventCountForMonth(summary.month);
+          const hasData = summary.totalIncome > 0 || summary.totalExpense > 0 || eventCount > 0;
 
           return (
             <div
@@ -97,9 +130,17 @@ export function YearBlock({ year, onEdit }: YearBlockProps) {
                 disabled={!hasData}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-lg font-semibold text-dark-100">
-                    {summary.month}월
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-semibold text-dark-100">
+                      {summary.month}월
+                    </span>
+                    {eventCount > 0 && (
+                      <span className="flex items-center gap-1 px-1.5 py-0.5 bg-purple-500/20 rounded text-xs text-purple-400">
+                        <Flag className="w-2.5 h-2.5" />
+                        {eventCount}
+                      </span>
+                    )}
+                  </div>
                   {hasData && (
                     isExpanded ? (
                       <ChevronUp className="w-4 h-4 text-dark-400" />
@@ -109,7 +150,7 @@ export function YearBlock({ year, onEdit }: YearBlockProps) {
                   )}
                 </div>
 
-                {hasData ? (
+                {summary.totalIncome > 0 || summary.totalExpense > 0 ? (
                   <div className="space-y-1">
                     <div className="flex justify-between text-sm">
                       <span className="text-dark-500">수입</span>
@@ -126,14 +167,40 @@ export function YearBlock({ year, onEdit }: YearBlockProps) {
                       </span>
                     </div>
                   </div>
+                ) : eventCount > 0 ? (
+                  <p className="text-sm text-purple-400">이벤트만 있음</p>
                 ) : (
                   <p className="text-sm text-dark-600">거래 없음</p>
                 )}
               </button>
 
-              {/* 확장된 거래 목록 */}
-              {isExpanded && transactions.length > 0 && (
+              {/* 확장된 거래 및 이벤트 목록 */}
+              {isExpanded && (transactions.length > 0 || monthEvents.length > 0) && (
                 <div className="border-t border-dark-700 p-3 space-y-2 max-h-60 overflow-y-auto">
+                  {/* 이벤트 */}
+                  {monthEvents.map((ev) => (
+                    <button
+                      key={`e-${ev.id}`}
+                      onClick={() => onEditEvent?.(ev)}
+                      className={`w-full flex items-center justify-between p-2 rounded-lg transition-colors text-left ${EVENT_BG_CLASSES[ev.color]}`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        {ev.isImportant ? (
+                          <Star className="w-3 h-3 text-amber-400 fill-amber-400 flex-shrink-0" />
+                        ) : (
+                          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${EVENT_COLOR_CLASSES[ev.color]}`} />
+                        )}
+                        <span className="text-sm text-dark-200 truncate">{ev.title}</span>
+                        <span className="text-xs text-dark-500 flex-shrink-0">
+                          {new Date(ev.date).getDate()}일
+                        </span>
+                      </div>
+                      <span className="text-xs text-dark-400 whitespace-nowrap ml-2">
+                        {EVENT_CATEGORY_LABELS[ev.category]}
+                      </span>
+                    </button>
+                  ))}
+                  {/* 거래 */}
                   {transactions.map((t) => (
                     <button
                       key={`${t.id}-${t.date}`}
